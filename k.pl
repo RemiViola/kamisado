@@ -1,5 +1,5 @@
-/*	une case vide est représentée par une liste [couleur]
-	une case occupéeest représentée par une liste [couleur,tour,joueur]
+/*	une case vide est représentée par une liste [ligne,colonne,couleur]
+	une case occupée est représentée par une liste [ligne,colonne,couleur,tour,joueur]
 	les joueurs sont a et b
 	les couleurs sont orange(or), bleu(bl), violet(pu), rose(pi), jaune(ye), rouge(re), vert(gr) et marron(br)
 	les directions de déplacement sont gauche(le), avant(fo) et droite(ri)
@@ -16,6 +16,9 @@
 [[br,br,a],[gr,gr,a],[re,re,a],[ye,ye,a],[pi,pi,a],[pu,pu,a],[bl,bl,a],[or,or,a]]]).
 */
 
+/*Pour rendre le plateau modifiable*/
+:-dynamic(plateau/1).
+
 plateau([
 [[1,1,or,or,b],[1,2,bl,bl,b],[1,3,pu,pu,b],[1,4,pi,pi,b],[1,5,ye,ye,b],[1,6,re,re,b],[1,7,gr,gr,b],[1,8,br,br,b]],
 [[2,1,re],[2,2,or],[2,3,pi],[2,4,gr],[2,5,bl],[2,6,ye],[2,7,br],[2,8,pu]],
@@ -26,6 +29,10 @@ plateau([
 [[7,1,pu],[7,2,br],[7,3,ye],[7,4,bl],[7,5,gr],[7,6,pi],[7,7,or],[7,8,re]],
 [[8,1,br,br,a],[8,2,gr,gr,a],[8,3,re,re,a],[8,4,ye,ye,a],[8,5,pi,pi,a],[8,6,pu,pu,a],[8,7,bl,bl,a],[8,8,or,or,a]]]).
 
+/*Pour tests :
+[[[1,1,or,or,b],[1,2,bl,bl,b],[1,3,pu,pu,b],[1,4,pi,pi,b],[1,5,ye,ye,b],[1,6,re,re,b],[1,7,gr,gr,b],[1,8,br,br,b]],[[2,1,re],[2,2,or],[2,3,pi],[2,4,gr],[2,5,bl],[2,6,ye],[2,7,br],[2,8,pu]],[[3,1,gr],[3,2,pi],[3,3,or],[3,4,re],[3,5,pu],[3,6,br],[3,7,ye],[3,8,bl]],[[4,1,pi],[4,2,pu],[4,3,bl],[4,4,or],[4,5,br],[4,6,gr],[4,7,re],[4,8,ye]],[[5,1,ye],[5,2,re],[5,3,gr],[5,4,br],[5,5,or],[5,6,bl],[5,7,pu],[5,8,pi]],[[6,1,bl],[6,2,ye],[6,3,br],[6,4,pu],[6,5,re],[6,6,or],[6,7,pi],[6,8,gr]],[[7,1,pu],[7,2,br],[7,3,ye],[7,4,bl],[7,5,gr],[7,6,pi],[7,7,or],[7,8,re]],[[8,1,br,br,a],[8,2,gr,gr,a],[8,3,re,re,a],[8,4,ye,ye,a],[8,5,pi,pi,a],[8,6,pu,pu,a],[8,7,bl,bl,a],[8,8,or,or,a]]]
+*/
+
 case(X):-
 	plateau(L),
 	member(LL,L),
@@ -35,6 +42,99 @@ my_flatten([],[]):-!.
 my_flatten([H|T],L):-
 	my_flatten(T,LL),
 	append(H,LL,L).
+
+/*Déplacement d'une tour du joueur a et modification du plateau 		/!\ manque vérif accessibilité via obstacle
+deplacer(Tour,Direction,Nb_Case)*/
+deplacer_a(T,fo,N):-
+	plateau(P),
+	my_flatten(P,PP),
+	member([A,O,_C,T,a],PP),
+	NA is A-N,
+	member([NA,O,_NC],PP),
+	modifier_plateau(P,A,O,NA,O,T,a,NP),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+deplacer_a(T,le,N):-
+	plateau(P),
+	my_flatten(P,PP),
+	member([A,O,_C,T,a],PP),
+	NA is A-N,
+	NO is O-N,
+	member([NA,NO,_NC],PP),
+	modifier_plateau(P,A,O,NA,NO,T,a,NP),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+deplacer_a(T,ri,N):-
+	plateau(P),
+	my_flatten(P,PP),
+	member([A,O,_C,T,a],PP),
+	NA is A-N,
+	NO is O+N,
+	member([NA,NO,_NC],PP),
+	modifier_plateau(P,A,O,NA,NO,T,a,NP),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+
+/*Déplacement d'une tour du joueur b et modification du plateau 		/!\ manque vérif accessibilité via obstacle
+deplacer(Tour,Direction,Nb_Case)*/
+deplacer_b(T,fo,N):-
+	plateau(P),
+	my_flatten(P,PP),
+	member([A,O,_C,T,b],PP),
+	NA is A+N,
+	member([NA,O,_NC],PP),
+	modifier_plateau(P,A,O,NA,O,T,b,NP),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+deplacer_b(T,le,N):-
+	plateau(P),
+	my_flatten(P,PP),
+	member([A,O,_C,T,b],PP),
+	NA is A+N,
+	NO is O-N,
+	member([NA,NO,_NC],PP),
+	modifier_plateau(P,A,O,NA,NO,T,b,NP),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+deplacer_b(T,ri,N):-
+	plateau(P),
+	my_flatten(P,PP),
+	member([A,O,_C,T,b],PP),
+	NA is A+N,
+	NO is O+N,
+	member([NA,NO,_NC],PP),
+	modifier_plateau(P,A,O,NA,NO,T,b,NP),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+
+/*Modification du plateau de jeu
+modifier_plateau(Plateau,Abs,Ord,NewAabs,NewOrd,Tour,Joueur,NewPlateau)*/
+modifier_plateau([],_A,_O,_NA,_NO,_T,_J,[]):-!.
+modifier_plateau([H|TT],A,O,NA,NO,T,J,NP):-
+	modifier_liste(H,A,O,NA,NO,T,J,NH),
+	modifier_plateau(TT,A,O,NA,NO,T,J,NT),
+	append([NH],NT,NP).
+
+modifier_liste([],_A,_O,_NA,_NO,_T,_J,[]):-!.
+modifier_liste([H|TT],A,O,NA,NO,T,J,NL):-
+	H = [A,O,C,T,J],
+	modifier_liste(TT,A,O,NA,NO,T,J,NT),
+	append([[A,O,C]],NT,NL).
+modifier_liste([H|TT],A,O,NA,NO,T,J,NL):-
+	H = [NA,NO,C],
+	modifier_liste(TT,A,O,NA,NO,T,J,NT),
+	append([[NA,NO,C,T,J]],NT,NL).
+modifier_liste([H|TT],A,O,NA,NO,T,J,NL):-
+	H \= [NA,NO,C],
+	H \= [A,O,C,T,J],
+	modifier_liste(TT,A,O,NA,NO,T,J,NT),
+	append([H],NT,NL).
 
 /*Recherche des cases accessibles depuis la case X occupée par le joueur b*/
 accessible_b(X,L):-
