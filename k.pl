@@ -13,7 +13,8 @@
 [[ye],[re],[gr],[br],[or],[bl],[pu],[pi]],
 [[bl],[ye],[br],[pu],[re],[or],[pi],[gr]],
 [[pu],[br],[ye],[bl],[gr],[pi],[or],[re]],
-[[br,br,a],[gr,gr,a],[re,re,a],[ye,ye,a],[pi,pi,a],[pu,pu,a],[bl,bl,a],[or,or,a]]]).*/
+[[br,br,a],[gr,gr,a],[re,re,a],[ye,ye,a],[pi,pi,a],[pu,pu,a],[bl,bl,a],[or,or,a]]]).
+*/
 
 plateau([
 [[1,1,or,or,b],[1,2,bl,bl,b],[1,3,pu,pu,b],[1,4,pi,pi,b],[1,5,ye,ye,b],[1,6,re,re,b],[1,7,gr,gr,b],[1,8,br,br,b]],
@@ -30,53 +31,116 @@ case(X):-
 	member(LL,L),
 	member(X,LL).
 
+my_flatten([],[]):-!.
+my_flatten([H|T],L):-
+	my_flatten(T,LL),
+	append(H,LL,L).
 
-/*Recherche des cases accessibles depuis la case occupée X*/
+/*Recherche des cases accessibles depuis la case X occupée par le joueur b*/
+accessible_b(X,L):-
+	X = [A,O,_C,_T,b],
+	plateau(P),
+	my_flatten(P,PP),
+	AA is A+1,
+	OG is O-1,
+	OD is O+1,
+	accessible_gauche_b(AA,OG,LG,PP),
+	accessible_avant_b(AA,O,LA,PP),
+	accessible_droite_b(AA,OD,LD,PP),
+	write(LG),nl,write(LA),nl,write(LD),nl,
+	append(LG,LA,LL),
+	append(LL,LD,L),!.
+
+accessible_gauche_b(_A,0,[],_PP):-!.
+accessible_gauche_b(9,_O,[],_PP):-!.
+accessible_gauche_b(A,O,[],PP):-
+	member([A,O,_,_,a],PP),!.
+accessible_gauche_b(A,O,[],PP):-
+	member([A,O,_,_,b],PP),!.
+accessible_gauche_b(A,O,L,PP):-
+	AA is A+1,
+	OO is O-1,
+	accessible_gauche_b(AA,OO,LL,PP),
+	member([A,O,X],PP),
+	append([[A,O,X]],LL,L).
+
+accessible_avant_b(9,_O,[],_PP):-!.
+accessible_avant_b(A,O,[],PP):-
+	member([A,O,_,_,a],PP),!.
+accessible_avant_b(A,O,[],PP):-
+	member([A,O,_,_,b],PP),!.
+accessible_avant_b(A,O,L,PP):-
+	AA is A+1,
+	accessible_avant_b(AA,O,LL,PP),
+	member([A,O,X],PP),
+	append([[A,O,X]],LL,L).
+
+accessible_droite_b(9,_O,[],_PP):-!.
+accessible_droite_b(_A,9,[],_PP):-!.
+accessible_droite_b(A,O,[],PP):-
+	member([A,O,_,_,a],PP),!.
+accessible_droite_b(A,O,[],PP):-
+	member([A,O,_,_,b],PP),!.
+accessible_droite_b(A,O,L,PP):-
+	AA is A+1,
+	OO is O+1,
+	accessible_droite_b(AA,OO,LL,PP),
+	member([A,O,X],PP),
+	append([[A,O,X]],LL,L).
+
+/*Recherche des cases accessibles depuis la case X occupée par le joueur a*/
 accessible_a(X,L):-
 	X = [A,O,_C,_T,a],
+	plateau(P),
+	my_flatten(P,PP),
 	AA is A-1,
 	OG is O-1,
 	OD is O+1,
-	accessible_gauche_a(AA,OG,LG),
-	accessible_avant_a(AA,O,LA),
-	accessible_droite_a(AA,OD,LD),
+	accessible_gauche_a(AA,OG,LG,PP),
+	accessible_avant_a(AA,O,LA,PP),
+	accessible_droite_a(AA,OD,LD,PP),
+	write(LG),nl,write(LA),nl,write(LD),nl,
 	append(LG,LA,LL),
-	append(LL,LD,L).
+	append(LL,LD,L),!.
 
-accessible_gauche_a(_A,0,[]):-!.
-accessible_gauche_a(0,_O,[]):-!.
-accessible_gauche_a(A,O,[]):-
-	case([A,O,_,_,a]).
-accessible_gauche_a(A,O,[]):-
-	case([A,O,_,_,b]).
-accessible_gauche_a(A,O,L):-
+accessible_gauche_a(_A,0,[],_PP):-!.
+accessible_gauche_a(0,_O,[],_PP):-!.
+accessible_gauche_a(A,O,[],PP):-
+	member([A,O,_,_,a],PP).
+accessible_gauche_a(A,O,[],PP):-
+	member([A,O,_,_,b],PP).
+accessible_gauche_a(A,O,L,PP):-
 	AA is A-1,
 	OO is O-1,
-	accessible_droite_a(AA,OO,LL),
-	append(case([A,O,X]),LL,L).
+	accessible_gauche_a(AA,OO,LL,PP),
+	member([A,O,X],PP),
+	append([[A,O,X]],LL,L).
 
-accessible_avant_a(0,_O,[]):-!.
-accessible_avant_a(A,O,[]):-
-	case([A,O,_,_,a]).
-accessible_avant_a(A,O,[]):-
-	case([A,O,_,_,b]).
-accessible_avant_a(A,O,L):-
+accessible_avant_a(0,_O,[],_PP):-!.
+accessible_avant_a(A,O,[],PP):-
+	member([A,O,_,_,a],PP).
+accessible_avant_a(A,O,[],PP):-
+	member([A,O,_,_,b],PP).
+accessible_avant_a(A,O,L,PP):-
 	AA is A-1,
-	accessible_droite_a(AA,O,LL),
-	append(case([A,O,X]),LL,L).
+	accessible_avant_a(AA,O,LL,PP),
+	member([A,O,X],PP),
+	append([[A,O,X]],LL,L).
 
-accessible_droite_a(0,_O,[]):-!.
-accessible_droite_a(_A,9,[]):-!.
-accessible_droite_a(A,O,[]):-
-	case([A,O,_,_,a]).
-accessible_droite_a(A,O,[]):-
-	case([A,O,_,_,b]).
-accessible_droite_a(A,O,L):-
+accessible_droite_a(0,_O,[],_PP):-!.
+accessible_droite_a(_A,9,[],_PP):-!.
+accessible_droite_a(A,O,[],PP):-
+	member([A,O,_,_,a],PP).
+accessible_droite_a(A,O,[],PP):-
+	member([A,O,_,_,b],PP).
+accessible_droite_a(A,O,L,PP):-
 	AA is A-1,
 	OO is O+1,
-	accessible_droite_a(AA,OO,LL),
-	append(case([A,O,X]),LL,L).
+	accessible_droite_a(AA,OO,LL,PP),
+	member([A,O,X],PP),
+	append([[A,O,X]],LL,L).
 
+/*dessin du plateau en mode console*/
 dessiner_case([_,_,X]):-
 	write(X),write('     '),!.
 dessiner_case([_,_,X,Y,Z]):-
