@@ -5,17 +5,6 @@
 	les directions de déplacement sont gauche(le), avant(fo) et droite(ri)
 */
 
-/*plateau([
-[[or,or,b],[bl,bl,b],[pu,pu,b],[pi,pi,b],[ye,ye,b],[re,re,b],[gr,gr,b],[br,br,b]],
-[[re],[or],[pi],[gr],[bl],[ye],[br],[pu]],
-[[gr],[pi],[or],[re],[pu],[br],[ye],[bl]],
-[[pi],[pu],[bl],[or],[br],[gr],[re],[ye]],
-[[ye],[re],[gr],[br],[or],[bl],[pu],[pi]],
-[[bl],[ye],[br],[pu],[re],[or],[pi],[gr]],
-[[pu],[br],[ye],[bl],[gr],[pi],[or],[re]],
-[[br,br,a],[gr,gr,a],[re,re,a],[ye,ye,a],[pi,pi,a],[pu,pu,a],[bl,bl,a],[or,or,a]]]).
-*/
-
 /*Pour rendre le plateau modifiable*/
 :-dynamic(plateau/1).
 
@@ -28,10 +17,6 @@ plateau([
 [[6,1,bl],[6,2,ye],[6,3,br],[6,4,pu],[6,5,re],[6,6,or],[6,7,pi],[6,8,gr]],
 [[7,1,pu],[7,2,br],[7,3,ye],[7,4,bl],[7,5,gr],[7,6,pi],[7,7,or],[7,8,re]],
 [[8,1,br,br,a],[8,2,gr,gr,a],[8,3,re,re,a],[8,4,ye,ye,a],[8,5,pi,pi,a],[8,6,pu,pu,a],[8,7,bl,bl,a],[8,8,or,or,a]]]).
-
-/*Pour tests :
-[[[1,1,or,or,b],[1,2,bl,bl,b],[1,3,pu,pu,b],[1,4,pi,pi,b],[1,5,ye,ye,b],[1,6,re,re,b],[1,7,gr,gr,b],[1,8,br,br,b]],[[2,1,re],[2,2,or],[2,3,pi],[2,4,gr],[2,5,bl],[2,6,ye],[2,7,br],[2,8,pu]],[[3,1,gr],[3,2,pi],[3,3,or],[3,4,re],[3,5,pu],[3,6,br],[3,7,ye],[3,8,bl]],[[4,1,pi],[4,2,pu],[4,3,bl],[4,4,or],[4,5,br],[4,6,gr],[4,7,re],[4,8,ye]],[[5,1,ye],[5,2,re],[5,3,gr],[5,4,br],[5,5,or],[5,6,bl],[5,7,pu],[5,8,pi]],[[6,1,bl],[6,2,ye],[6,3,br],[6,4,pu],[6,5,re],[6,6,or],[6,7,pi],[6,8,gr]],[[7,1,pu],[7,2,br],[7,3,ye],[7,4,bl],[7,5,gr],[7,6,pi],[7,7,or],[7,8,re]],[[8,1,br,br,a],[8,2,gr,gr,a],[8,3,re,re,a],[8,4,ye,ye,a],[8,5,pi,pi,a],[8,6,pu,pu,a],[8,7,bl,bl,a],[8,8,or,or,a]]]
-*/
 
 /*Pour recharger le plateau*/
 recharger:-
@@ -55,9 +40,10 @@ deplacer(Tour,Direction,Nb_Case)*/
 deplacer_a(T,fo,N):-
 	plateau(P),
 	my_flatten(P,PP),
-	member([A,O,_C,T,a],PP),
+	member([A,O,C,T,a],PP),
+	accessible_a([A,O,C,T,a],L),
 	NA is A-N,
-	member([NA,O,_NC],PP),
+	member([NA,O,_NC],L),
 	modifier_plateau(P,A,O,NA,O,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -65,10 +51,11 @@ deplacer_a(T,fo,N):-
 deplacer_a(T,le,N):-
 	plateau(P),
 	my_flatten(P,PP),
-	member([A,O,_C,T,a],PP),
+	member([A,O,C,T,a],PP),
+	accessible_a([A,O,C,T,a],L),
 	NA is A-N,
 	NO is O-N,
-	member([NA,NO,_NC],PP),
+	member([NA,NO,_NC],L),
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -76,10 +63,11 @@ deplacer_a(T,le,N):-
 deplacer_a(T,ri,N):-
 	plateau(P),
 	my_flatten(P,PP),
-	member([A,O,_C,T,a],PP),
+	member([A,O,C,T,a],PP),
+	accessible_a([A,O,C,T,a],L),
 	NA is A-N,
 	NO is O+N,
-	member([NA,NO,_NC],PP),
+	member([NA,NO,_NC],L),
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -90,9 +78,10 @@ deplacer(Tour,Direction,Nb_Case)*/
 deplacer_b(T,fo,N):-
 	plateau(P),
 	my_flatten(P,PP),
-	member([A,O,_C,T,b],PP),
+	member([A,O,C,T,b],PP),
+	accessible_b([A,O,C,T,b],L),
 	NA is A+N,
-	member([NA,O,_NC],PP),
+	member([NA,O,_NC],L),
 	modifier_plateau(P,A,O,NA,O,T,b,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -100,10 +89,11 @@ deplacer_b(T,fo,N):-
 deplacer_b(T,le,N):-
 	plateau(P),
 	my_flatten(P,PP),
-	member([A,O,_C,T,b],PP),
+	member([A,O,C,T,b],PP),
+	accessible_b([A,O,C,T,b],L),
 	NA is A+N,
 	NO is O-N,
-	member([NA,NO,_NC],PP),
+	member([NA,NO,_NC],L),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -111,10 +101,11 @@ deplacer_b(T,le,N):-
 deplacer_b(T,ri,N):-
 	plateau(P),
 	my_flatten(P,PP),
-	member([A,O,_C,T,b],PP),
+	member([A,O,C,T,b],PP),
+	accessible_b([A,O,C,T,b],L),
 	NA is A+N,
 	NO is O+N,
-	member([NA,NO,_NC],PP),
+	member([NA,NO,_NC],L),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -154,7 +145,7 @@ accessible_b(X,L):-
 	accessible_gauche_b(AA,OG,LG,PP),
 	accessible_avant_b(AA,O,LA,PP),
 	accessible_droite_b(AA,OD,LD,PP),
-	write(LG),nl,write(LA),nl,write(LD),nl,
+	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
 	append(LG,LA,LL),
 	append(LL,LD,L),!.
 
@@ -206,7 +197,7 @@ accessible_a(X,L):-
 	accessible_gauche_a(AA,OG,LG,PP),
 	accessible_avant_a(AA,O,LA,PP),
 	accessible_droite_a(AA,OD,LD,PP),
-	write(LG),nl,write(LA),nl,write(LD),nl,
+	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
 	append(LG,LA,LL),
 	append(LL,LD,L),!.
 
@@ -271,14 +262,5 @@ dessiner:-
 	write('-----------------------------------------------------------------'),nl,
 	plateau(L),
 	dessiner_plateau(L).
-
-
-
-
-
-
-
-
-
 
 
