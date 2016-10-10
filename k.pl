@@ -5,7 +5,7 @@
 	les directions de déplacement sont gauche(le), avant(fo) et droite(ri)
 */
 
-/*Pour rendre le plateau modifiable*/
+/*Le plateau modifiable*/
 :-dynamic(plateau/1).
 
 plateau([
@@ -17,6 +17,11 @@ plateau([
 [[6,1,bl],[6,2,ye],[6,3,br],[6,4,pu],[6,5,re],[6,6,or],[6,7,pi],[6,8,gr]],
 [[7,1,pu],[7,2,br],[7,3,ye],[7,4,bl],[7,5,gr],[7,6,pi],[7,7,or],[7,8,re]],
 [[8,1,br,br,a],[8,2,gr,gr,a],[8,3,re,re,a],[8,4,ye,ye,a],[8,5,pi,pi,a],[8,6,pu,pu,a],[8,7,bl,bl,a],[8,8,or,or,a]]]).
+
+/*La gestion de la couleur courante*/
+:-dynamic(couleur/1).
+
+couleur([or,bl,pu,pi,ye,re,gr,br]).
 
 /*Pour recharger le plateau*/
 recharger:-
@@ -35,15 +40,19 @@ my_flatten([H|T],L):-
 	my_flatten(T,LL),
 	append(H,LL,L).
 
-/*Déplacement d'une tour du joueur a et modification du plateau 		/!\ manque vérif accessibilité via obstacle
+/*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_a(T,fo,N):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,C,T,a],PP),
+	couleur(LC),
+	member(C,LC),
 	accessible_a([A,O,C,T,a],L),
 	NA is A-N,
-	member([NA,O,_NC],L),
+	member([NA,O,NC],L),
+	retract(couleur(LC)),
+	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,O,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -52,10 +61,14 @@ deplacer_a(T,le,N):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,C,T,a],PP),
+	couleur(LC),
+	member(C,LC),
 	accessible_a([A,O,C,T,a],L),
 	NA is A-N,
 	NO is O-N,
-	member([NA,NO,_NC],L),
+	member([NA,NO,NC],L),
+	retract(couleur(LC)),
+	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -64,24 +77,32 @@ deplacer_a(T,ri,N):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,C,T,a],PP),
+	couleur(LC),
+	member(C,LC),
 	accessible_a([A,O,C,T,a],L),
 	NA is A-N,
 	NO is O+N,
-	member([NA,NO,_NC],L),
+	member([NA,NO,NC],L),
+	retract(couleur(LC)),
+	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	dessiner,!.
 
-/*Déplacement d'une tour du joueur b et modification du plateau 		/!\ manque vérif accessibilité via obstacle
+/*Déplacement d'une tour du joueur b et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_b(T,fo,N):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,C,T,b],PP),
+	couleur(LC),
+	member(C,LC),
 	accessible_b([A,O,C,T,b],L),
 	NA is A+N,
-	member([NA,O,_NC],L),
+	member([NA,O,NC],L),
+	retract(couleur(LC)),
+	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,O,T,b,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -90,10 +111,14 @@ deplacer_b(T,le,N):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,C,T,b],PP),
+	couleur(LC),
+	member(C,LC),
 	accessible_b([A,O,C,T,b],L),
 	NA is A+N,
 	NO is O-N,
-	member([NA,NO,_NC],L),
+	member([NA,NO,NC],L),
+	retract(couleur(LC)),
+	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -102,17 +127,21 @@ deplacer_b(T,ri,N):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,C,T,b],PP),
+	couleur(LC),
+	member(C,LC),
 	accessible_b([A,O,C,T,b],L),
 	NA is A+N,
 	NO is O+N,
-	member([NA,NO,_NC],L),
+	member([NA,NO,NC],L),
+	retract(couleur(LC)),
+	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	dessiner,!.
 
 /*Modification du plateau de jeu
-modifier_plateau(Plateau,Abs,Ord,NewAabs,NewOrd,Tour,Joueur,NewPlateau)*/
+modifier_plateau(Plateau,Abs,Ord,NewAbs,NewOrd,Tour,Joueur,NewPlateau)*/
 modifier_plateau([],_A,_O,_NA,_NO,_T,_J,[]):-!.
 modifier_plateau([H|TT],A,O,NA,NO,T,J,NP):-
 	modifier_liste(H,A,O,NA,NO,T,J,NH),
