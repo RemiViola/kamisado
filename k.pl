@@ -48,7 +48,7 @@ deplacer_a(T,fo,N):-
 	member([A,O,C,T,a],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_a(T,L),
+	accessible(a,T,L),
 	NA is A-N,
 	member([NA,O,NC],L),
 	retract(couleur(LC)),
@@ -63,7 +63,7 @@ deplacer_a(T,le,N):-
 	member([A,O,C,T,a],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_a(T,L),
+	accessible(a,T,L),
 	NA is A-N,
 	NO is O-N,
 	member([NA,NO,NC],L),
@@ -79,7 +79,7 @@ deplacer_a(T,ri,N):-
 	member([A,O,C,T,a],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_a(T,L),
+	accessible(a,T,L),
 	NA is A-N,
 	NO is O+N,
 	member([NA,NO,NC],L),
@@ -98,7 +98,7 @@ deplacer_b(T,fo,N):-
 	member([A,O,C,T,b],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_b(T,L),
+	accessible(b,T,L),
 	NA is A+N,
 	member([NA,O,NC],L),
 	retract(couleur(LC)),
@@ -113,7 +113,7 @@ deplacer_b(T,le,N):-
 	member([A,O,C,T,b],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_b(T,L),
+	accessible(b,T,L),
 	NA is A+N,
 	NO is O-N,
 	member([NA,NO,NC],L),
@@ -129,7 +129,7 @@ deplacer_b(T,ri,N):-
 	member([A,O,C,T,b],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_b(T,L),
+	accessible(b,T,L),
 	NA is A+N,
 	NO is O+N,
 	member([NA,NO,NC],L),
@@ -277,7 +277,7 @@ dessiner_ligne([]):-
 	write('|'),nl,
 	write(' |       |       |       |       |       |       |       |       |'),nl,
 	write(' |       |       |       |       |       |       |       |       |'),nl,
-	write(' -----------------------------------------------------------------'),nl.
+	write('------------------------------------------------------------------'),nl.
 dessiner_ligne([H|T]):-
 	write('|'),dessiner_case(H),
 	dessiner_ligne(T).
@@ -290,8 +290,8 @@ dessiner_plateau([H|T],N):-
 	dessiner_plateau(T,M).
 
 dessiner:-
-	write('     1       2       3       4       5       6       7       8    '),nl,
-	write(' -----------------------------------------------------------------'),nl,
+	write(' |   1   |   2   |   3   |   4   |   5   |   6   |   7   |   8   |'),nl,
+	write('------------------------------------------------------------------'),nl,
 	plateau(L),
 	dessiner_plateau(L,1).
 
