@@ -48,7 +48,7 @@ deplacer_a(T,fo,N):-
 	member([A,O,C,T,a],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_a([A,O,C,T,a],L),
+	accessible_a(T,L),
 	NA is A-N,
 	member([NA,O,NC],L),
 	retract(couleur(LC)),
@@ -63,7 +63,7 @@ deplacer_a(T,le,N):-
 	member([A,O,C,T,a],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_a([A,O,C,T,a],L),
+	accessible_a(T,L),
 	NA is A-N,
 	NO is O-N,
 	member([NA,NO,NC],L),
@@ -79,7 +79,7 @@ deplacer_a(T,ri,N):-
 	member([A,O,C,T,a],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_a([A,O,C,T,a],L),
+	accessible_a(T,L),
 	NA is A-N,
 	NO is O+N,
 	member([NA,NO,NC],L),
@@ -98,7 +98,7 @@ deplacer_b(T,fo,N):-
 	member([A,O,C,T,b],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_b([A,O,C,T,b],L),
+	accessible_b(T,L),
 	NA is A+N,
 	member([NA,O,NC],L),
 	retract(couleur(LC)),
@@ -113,7 +113,7 @@ deplacer_b(T,le,N):-
 	member([A,O,C,T,b],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_b([A,O,C,T,b],L),
+	accessible_b(T,L),
 	NA is A+N,
 	NO is O-N,
 	member([NA,NO,NC],L),
@@ -129,7 +129,7 @@ deplacer_b(T,ri,N):-
 	member([A,O,C,T,b],PP),
 	couleur(LC),
 	member(C,LC),
-	accessible_b([A,O,C,T,b],L),
+	accessible_b(T,L),
 	NA is A+N,
 	NO is O+N,
 	member([NA,NO,NC],L),
@@ -164,10 +164,10 @@ modifier_liste([H|TT],A,O,NA,NO,T,J,NL):-
 	append([H],NT,NL).
 
 /*Recherche des cases accessibles depuis la case X occupée par le joueur b*/
-accessible_b(X,L):-
-	X = [A,O,_C,_T,b],
+accessible_b(T,L):-
 	plateau(P),
 	my_flatten(P,PP),
+	member([A,O,_C,T,b],PP),
 	AA is A+1,
 	OG is O-1,
 	OD is O+1,
@@ -216,10 +216,10 @@ accessible_droite_b(A,O,L,PP):-
 	append([[A,O,X]],LL,L).
 
 /*Recherche des cases accessibles depuis la case X occupée par le joueur a*/
-accessible_a(X,L):-
-	X = [A,O,_C,_T,a],
+accessible_a(T,L):-
 	plateau(P),
 	my_flatten(P,PP),
+	member([A,O,_C,T,a],PP),
 	AA is A-1,
 	OG is O-1,
 	OD is O+1,
@@ -275,21 +275,24 @@ dessiner_case([_,_,X,Y,Z]):-
 
 dessiner_ligne([]):-
 	write('|'),nl,
-	write('|       |       |       |       |       |       |       |       |'),nl,
-	write('|       |       |       |       |       |       |       |       |'),nl,
-	write('-----------------------------------------------------------------'),nl.
+	write(' |       |       |       |       |       |       |       |       |'),nl,
+	write(' |       |       |       |       |       |       |       |       |'),nl,
+	write(' -----------------------------------------------------------------'),nl.
 dessiner_ligne([H|T]):-
 	write('|'),dessiner_case(H),
 	dessiner_ligne(T).
 
-dessiner_plateau([]).
-dessiner_plateau([H|T]):-
+dessiner_plateau([],_).
+dessiner_plateau([H|T],N):-
+	write(N),
+	M is N+1,
 	dessiner_ligne(H),
-	dessiner_plateau(T).
+	dessiner_plateau(T,M).
 
 dessiner:-
-	write('-----------------------------------------------------------------'),nl,
+	write('     1       2       3       4       5       6       7       8    '),nl,
+	write(' -----------------------------------------------------------------'),nl,
 	plateau(L),
-	dessiner_plateau(L).
+	dessiner_plateau(L,1).
 
 
