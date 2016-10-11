@@ -164,7 +164,7 @@ modifier_liste([H|TT],A,O,NA,NO,T,J,NL):-
 	append([H],NT,NL).
 
 /*Recherche des cases accessibles depuis la case X occupée par le joueur b*/
-accessible_b(T,L):-
+accessible(b,T,L):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,_C,T,b],PP),
@@ -216,7 +216,7 @@ accessible_droite_b(A,O,L,PP):-
 	append([[A,O,X]],LL,L).
 
 /*Recherche des cases accessibles depuis la case X occupée par le joueur a*/
-accessible_a(T,L):-
+accessible(a,T,L):-
 	plateau(P),
 	my_flatten(P,PP),
 	member([A,O,_C,T,a],PP),
