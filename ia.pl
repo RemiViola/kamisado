@@ -1,11 +1,11 @@
 test_couleur_bloque(a,Coul,L,L_):-
     accessible(b,Coul,L_coup_possible),
-    memberchk([1,_,_],L_coup_possible),
+    memberchk([8,_,_],L_coup_possible),
     append([Coul],L,L_).
 
 test_couleur_bloque(a,Coul,L,L_):-
     accessible(b,Coul,L_coup_possible),
-    not(memberchk([1,_,_],L_coup_possible)),
+    not(memberchk([8,_,_],L_coup_possible)),
     append([],L,L_).
 
 test_couleur_bloque(b,Coul,L,L_):-
