@@ -41,7 +41,7 @@ deplacer_a(T,fo,N):-
 	member([A,O,C,T,a],P),
 	couleur(LC),
 	member(C,LC),
-	accessible(a,T,L),
+	accessible(a,T,P,L),
 	NA is A-N,
 	member([NA,O,NC],L),
 	retract(couleur(LC)),
@@ -55,7 +55,7 @@ deplacer_a(T,le,N):-
 	member([A,O,C,T,a],P),
 	couleur(LC),
 	member(C,LC),
-	accessible(a,T,L),
+	accessible(a,T,P,L),
 	NA is A-N,
 	NO is O-N,
 	member([NA,NO,NC],L),
@@ -70,7 +70,7 @@ deplacer_a(T,ri,N):-
 	member([A,O,C,T,a],P),
 	couleur(LC),
 	member(C,LC),
-	accessible(a,T,L),
+	accessible(a,T,P,L),
 	NA is A-N,
 	NO is O+N,
 	member([NA,NO,NC],L),
@@ -88,7 +88,7 @@ deplacer_b(T,fo,N):-
 	member([A,O,C,T,b],P),
 	couleur(LC),
 	member(C,LC),
-	accessible(b,T,L),
+	accessible(b,T,P,L),
 	NA is A+N,
 	member([NA,O,NC],L),
 	retract(couleur(LC)),
@@ -102,7 +102,7 @@ deplacer_b(T,le,N):-
 	member([A,O,C,T,b],P),
 	couleur(LC),
 	member(C,LC),
-	accessible(b,T,L),
+	accessible(b,T,P,L),
 	NA is A+N,
 	NO is O-N,
 	member([NA,NO,NC],L),
@@ -117,7 +117,7 @@ deplacer_b(T,ri,N):-
 	member([A,O,C,T,b],P),
 	couleur(LC),
 	member(C,LC),
-	accessible(b,T,L),
+	accessible(b,T,P,L),
 	NA is A+N,
 	NO is O+N,
 	member([NA,NO,NC],L),
@@ -146,8 +146,7 @@ modifier_plateau([H|TT],A,O,NA,NO,T,J,NL):-
 	append([H],NT,NL).
 
 /*Recherche des cases accessibles pour le tour T du joueur b*/
-accessible(b,T,L):-
-	plateau(P),
+accessible(b,T,P,L):-
 	member([A,O,_C,T,b],P),
 	AA is A+1,
 	OG is O-1,
@@ -155,6 +154,19 @@ accessible(b,T,L):-
 	accessible_gauche_b(AA,OG,LG,P),
 	accessible_avant_b(AA,O,LA,P),
 	accessible_droite_b(AA,OD,LD,P),
+	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
+	append(LG,LA,LL),
+	append(LL,LD,L),!.
+
+/*Recherche des cases accessibles pour le tour T du joueur a*/
+accessible(a,T,P,L):-
+	member([A,O,_C,T,a],P),
+	AA is A-1,
+	OG is O-1,
+	OD is O+1,
+	accessible_gauche_a(AA,OG,LG,P),
+	accessible_avant_a(AA,O,LA,P),
+	accessible_droite_a(AA,OD,LD,P),
 	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
 	append(LG,LA,LL),
 	append(LL,LD,L),!.
@@ -195,20 +207,6 @@ accessible_droite_b(A,O,L,P):-
 	accessible_droite_b(AA,OO,LL,P),
 	member([A,O,X],P),
 	append([[A,O,X]],LL,L).
-
-/*Recherche des cases accessibles pour le tour T du joueur a*/
-accessible(a,T,L):-
-	plateau(P),
-	member([A,O,_C,T,a],P),
-	AA is A-1,
-	OG is O-1,
-	OD is O+1,
-	accessible_gauche_a(AA,OG,LG,P),
-	accessible_avant_a(AA,O,LA,P),
-	accessible_droite_a(AA,OD,LD,P),
-	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
-	append(LG,LA,LL),
-	append(LL,LD,L),!.
 
 accessible_gauche_a(_A,0,[],_P):-!.
 accessible_gauche_a(0,_O,[],_P):-!.
