@@ -1,4 +1,10 @@
-/*Prédicat de gestion de l'IA, premier coup, suivants sauf victoire...*/
+/*Il manque la gestion de la victoire du joueur...
+
+Chercher un moyen d'évaluer le coup optimum pour l'IA...
+peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
+Choisir dans ce cas le meilleur ratio ?*/
+
+/*Prédicat de gestion de l'IA, premier coup, suivants et victoire...*/
 jouer:-
 	couleur([C,_|T]),
 	plateau(P),
@@ -24,13 +30,13 @@ jouer:-
 	assert(plateau(NP)),
 	dessiner,
 	nl,nl,nl,
-	write('YY    YY  OOOO  UU  UU      LL      OOOO   OOOO   SSSS  EEEEEE'),nl,
-	write('YY    YY OOOOOO UU  UU      LL     OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
-	write(' YY  YY  OO  OO UU  UU      LL     OO  OO OO  OO SS     EE'),nl,
-	write('  YYYY   OO  OO UU  UU      LL     OO  OO OO  OO   SS   EEEE'),nl,
-	write('   YY    OO  OO UU  UU      LL     OO  OO OO  OO     SS EE'),nl,
-	write('   YY    OOOOOO UUUUUU      LLLLLL OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
-	write('   YY     OOOO   UUUU       LLLLLL  OOOO   OOOO   SSSS  EEEEEE'),nl,!.
+	write('                    YY    YY  OOOO  UU  UU      LL      OOOO   OOOO   SSSS  EEEEEE'),nl,
+	write('                    YY    YY OOOOOO UU  UU      LL     OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
+	write('                     YY  YY  OO  OO UU  UU      LL     OO  OO OO  OO SS     EE'),nl,
+	write('                      YYYY   OO  OO UU  UU      LL     OO  OO OO  OO   SS   EEEE'),nl,
+	write('                       YY    OO  OO UU  UU      LL     OO  OO OO  OO     SS EE'),nl,
+	write('                       YY    OOOOOO UUUUUU      LLLLLL OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
+	write('                       YY     OOOO   UUUU       LLLLLL  OOOO   OOOO   SSSS  EEEEEE'),nl,!.
 
 jouer:-
 	couleur([C]),
@@ -352,7 +358,7 @@ my_merge([H1,H3|T1],[H2,H4|T2],L):-
 /*simule un déplacement et retourne un plateau provisoire et la couleur correspondante*/
 deplacer2(T,NA,NO,NP,NC):-
 	plateau(P),
-	member([A,O,C,T,b],P),
+	member([A,O,_C,T,b],P),
 	couleur(LC),
 	member(T,LC),
 	accessible(b,T,P,L),

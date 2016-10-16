@@ -3,6 +3,10 @@
 	les joueurs sont a et b
 	les couleurs sont orange(or), bleu(bl), violet(pu), rose(pi), jaune(ye), rouge(re), vert(gr) et marron(br)
 	les directions de déplacement sont gauche(le), avant(fo) et droite(ri)
+
+
+Il manque la gestion de la victoire du joueur...
+
 */
 
 /*Le plateau modifiable*/
