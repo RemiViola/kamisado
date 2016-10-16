@@ -151,8 +151,8 @@ accessible(b,T,P,L):-
 	AA is A+1,
 	OG is O-1,
 	OD is O+1,
-	accessible_gauche_b(AA,OG,LG,P),
 	accessible_avant_b(AA,O,LA,P),
+	accessible_gauche_b(AA,OG,LG,P),
 	accessible_droite_b(AA,OD,LD,P),
 	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
 	append(LG,LA,LL),
@@ -164,8 +164,8 @@ accessible(a,T,P,L):-
 	AA is A-1,
 	OG is O-1,
 	OD is O+1,
-	accessible_gauche_a(AA,OG,LG,P),
 	accessible_avant_a(AA,O,LA,P),
+	accessible_gauche_a(AA,OG,LG,P),
 	accessible_droite_a(AA,OD,LD,P),
 	/*write(LG),nl,write(LA),nl,write(LD),nl,*/
 	append(LG,LA,LL),
