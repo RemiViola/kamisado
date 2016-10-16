@@ -1,4 +1,37 @@
-/*Hors premier coup à cause du couleur([C])				ne fait rien pour le moment...*/
+/*Prédicat de gestion de l'IA, premier coup, suivants sauf victoire...*/
+jouer:-
+	couleur([C,_|T]),
+	plateau(P),
+	member([A,O,_,C,b],P),
+	NA is A+1,
+	deplacer2(C,NA,O,NP,NC),
+	retract(couleur([C|T])),
+	assert(couleur([NC])),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,!.
+
+jouer:-
+	couleur([C]),
+	plateau(P),
+	accessible(b,C,P,L_accessible),
+	member([8,O,NC],L_accessible),
+	deplacer2(C,8,O,NP,NC),
+	retract(couleur([C])),
+	assert(couleur([NC])),
+	plateau(P),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	dessiner,
+	nl,nl,nl,
+	write('YY    YY  OOOO  UU  UU      LL      OOOO   OOOO   SSSS  EEEEEE'),nl,
+	write('YY    YY OOOOOO UU  UU      LL     OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
+	write(' YY  YY  OO  OO UU  UU      LL     OO  OO OO  OO SS     EE'),nl,
+	write('  YYYY   OO  OO UU  UU      LL     OO  OO OO  OO   SS   EEEE'),nl,
+	write('   YY    OO  OO UU  UU      LL     OO  OO OO  OO     SS EE'),nl,
+	write('   YY    OOOOOO UUUUUU      LLLLLL OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
+	write('   YY     OOOO   UUUU       LLLLLL  OOOO   OOOO   SSSS  EEEEEE'),nl,!.
+
 jouer:-
 	couleur([C]),
 	jouable(b,C,L_jouable),
@@ -321,7 +354,7 @@ deplacer2(T,NA,NO,NP,NC):-
 	plateau(P),
 	member([A,O,C,T,b],P),
 	couleur(LC),
-	member(C,LC),
+	member(T,LC),
 	accessible(b,T,P,L),
 	member([NA,NO,NC],L),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
