@@ -2,30 +2,32 @@
 jouer:-
 	couleur([C]),
 	jouable(b,C,L_jouable),
-	write('Couleur active : '),write(C),nl,
-	write('Liste des cases jouables sans risque : '),write(L_jouable),nl,
+	/*write('Couleur active : '),write(C),nl,
+	write('Liste des cases jouables sans risque : '),write(L_jouable),nl,*/
 	my_sort(L_jouable,L_sort),
-	write('Liste des cases jouables triée : '),write(L_sort),nl,
+	/*write('Liste des cases jouables triée : '),write(L_sort),nl,*/
 	choix(L_sort,L_sort,C,X),
-	write('Choix fait'),write(X),nl,
+	/*write('Choix fait'),write(X),nl,*/
 	X = [A,O,NC],
 	deplacer2(C,A,O,NP,NC),
+	retract(couleur([C])),
+	assert(couleur([NC])),
 	plateau(P),
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	dessiner,!.
 
-/*Choix de la case à jouer dans La liste des jouables				Penser à ordonner la liste des jouables avant...*/
+/*Choix de la case à jouer dans la liste des jouables ordonnées*/
 choix([],[H|_],_,H):-
-	write('arrivé à la fin de liste jouable'),nl,!.
+	/*write('arrivé à la fin de liste jouable'),nl,*/!.
 choix([H|_],_,Tour,H):-
-	write('test de '),write(H),nl,
+	/*write('test de '),write(H),nl,*/
 	H = [A,O,_],
 	deplacer2(Tour,A,O,NP,_),
 	accessible(b,Tour,NP,Liste_accessible),write(Liste_accessible),nl,nl,
 	member([8,_,_],Liste_accessible),!.
 choix([H|T],L,Tour,HH):-
-	write('test2 de '),write(H),nl,
+	/*write('test2 de '),write(H),nl,*/
 	H = [A,O,_],
 	deplacer2(Tour,A,O,NP,_),
 	accessible(b,Tour,NP,Liste_accessible),write(Liste_accessible),nl,nl,
@@ -62,14 +64,14 @@ tester_case(Tour,X,L):-
 my_sort([],[]):-!.
 my_sort([X],[X]):-!.
 my_sort(L,LS):-
-	write('split de : '),write(L),nl,
+	/*write('split de : '),write(L),nl,*/
 	my_split(L,L1,L2),
-	write('split fait : '),write(L1),write(' et '),write(L2),nl,
+	/*write('split fait : '),write(L1),write(' et '),write(L2),nl,*/
 	my_sort(L1,LS1),
 	my_sort(L2,LS2),
-	write('merge de : '),write(LS1),write(' et '),write(LS2),nl,
-	my_merge(LS1,LS2,LS),
-	write('merge fait : '),write(LS),nl.
+	/*write('merge de : '),write(LS1),write(' et '),write(LS2),nl,*/
+	my_merge(LS1,LS2,LS)/*,
+	write('merge fait : '),write(LS),nl*/.
 
 my_split([],[],[]):-!.
 my_split([X],[X],[]):-!.
