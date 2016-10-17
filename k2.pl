@@ -47,6 +47,23 @@ case(X):-
 	plateau(L),
 	member(X,L).
 
+/*Teste la victoire du joueur*/
+tester(A):-
+	A \= 1,!.
+
+tester(A):-
+	A is 1,
+	retract(joueur(_)),
+	retract(couleur(_)),
+	nl,nl,nl,
+	write('                    YY    YY  OOOO  UU  UU      WW       WW II NNN     NN'),nl,
+	write('                    YY    YY OOOOOO UU  UU      WW       WW II NNNN    NN'),nl,
+	write('                     YY  YY  OO  OO UU  UU      WW       WW II NN NN   NN'),nl,
+	write('                      YYYY   OO  OO UU  UU      WW   W   WW II NN  NN  NN'),nl,
+	write('                       YY    OO  OO UU  UU       WW WWW WW  II NN   NN NN'),nl,
+	write('                       YY    OOOOOO UUUUUU       WWWW WWWW  II NN    NNNN'),nl,
+	write('                       YY     OOOO   UUUU         WW   WW   II NN     NNN'),nl,!.
+
 /*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_a(T,fo,N):-
@@ -66,7 +83,8 @@ deplacer_a(T,fo,N):-
 	modifier_plateau(P,A,O,NA,O,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	dessiner,!.
+	dessiner,
+	tester(NA),!.
 deplacer_a(T,le,N):-
 	joueur(LJ),
 	member(a,LJ),
@@ -85,7 +103,8 @@ deplacer_a(T,le,N):-
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	dessiner,!.
+	dessiner,
+	tester(NA),!.
 deplacer_a(T,ri,N):-
 	joueur(LJ),
 	member(a,LJ),
@@ -104,7 +123,8 @@ deplacer_a(T,ri,N):-
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	dessiner,!.
+	dessiner,
+	tester(NA),!.
 
 /*Déplacement d'une tour du joueur b et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/

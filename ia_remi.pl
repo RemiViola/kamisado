@@ -1,4 +1,4 @@
-/*Il manque la gestion de la victoire du joueur...
+/*Il manque la gestion du coup vide...
 
 Chercher un moyen d'évaluer le coup optimum pour l'IA...
 peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
@@ -30,9 +30,9 @@ jouer:-
 	member([8,O,NC],L_accessible),
 	deplacer2(C,8,O,NP,NC),
 	retract(joueur(_)),
-	assert(joueur([a])),
+	assert(joueur([])),
 	retract(couleur([C])),
-	assert(couleur([NC])),
+	assert(couleur([])),
 	plateau(P),
 	retract(plateau(P)),
 	assert(plateau(NP)),
