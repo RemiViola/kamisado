@@ -6,23 +6,31 @@ Choisir dans ce cas le meilleur ratio ?*/
 
 /*Prédicat de gestion de l'IA, premier coup, suivants et victoire...*/
 jouer:-
-	couleur([C,_|T]),
+	joueur(LJ),
+	member(b,LJ),
+	couleur([C,CC|T]),
 	plateau(P),
 	member([A,O,_,C,b],P),
 	NA is A+1,
 	deplacer2(C,NA,O,NP,NC),
-	retract(couleur([C|T])),
+	retract(joueur(_)),
+	assert(joueur([a])),
+	retract(couleur([C,CC|T])),
 	assert(couleur([NC])),
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	dessiner,!.
 
 jouer:-
+	joueur(LJ),
+	member(b,LJ),
 	couleur([C]),
 	plateau(P),
 	accessible(b,C,P,L_accessible),
 	member([8,O,NC],L_accessible),
 	deplacer2(C,8,O,NP,NC),
+	retract(joueur(_)),
+	assert(joueur([a])),
 	retract(couleur([C])),
 	assert(couleur([NC])),
 	plateau(P),
@@ -39,6 +47,8 @@ jouer:-
 	write('                       YY     OOOO   UUUU       LLLLLL  OOOO   OOOO   SSSS  EEEEEE'),nl,!.
 
 jouer:-
+	joueur(LJ),
+	member(b,LJ),
 	couleur([C]),
 	jouable(b,C,L_jouable),
 	/*write('Couleur active : '),write(C),nl,
@@ -49,6 +59,8 @@ jouer:-
 	/*write('Choix fait'),write(X),nl,*/
 	X = [A,O,NC],
 	deplacer2(C,A,O,NP,NC),
+	retract(joueur(_)),
+	assert(joueur([a])),
 	retract(couleur([C])),
 	assert(couleur([NC])),
 	plateau(P),

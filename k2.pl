@@ -27,9 +27,18 @@ plateau([
 
 couleur([or,bl,pu,pi,ye,re,gr,br]).
 
+/*La gestion du joueur courant*/
+:-dynamic(joueur/1).
+
+joueur([a,b]).
+
 /*Pour recharger le plateau*/
 recharger:-
+	retract(joueur(_)),
+	retract(couleur(_)),
 	retract(plateau(_)),
+	assert(joueur([a,b])),
+	assert(couleur([or,bl,pu,pi,ye,re,gr,br])),
 	assert(plateau([[1,1,or,or,b],[1,2,bl,bl,b],[1,3,pu,pu,b],[1,4,pi,pi,b],[1,5,ye,ye,b],[1,6,re,re,b],[1,7,gr,gr,b],[1,8,br,br,b],[2,1,re],[2,2,or],[2,3,pi],[2,4,gr],[2,5,bl],[2,6,ye],[2,7,br],[2,8,pu],[3,1,gr],[3,2,pi],[3,3,or],[3,4,re],[3,5,pu],[3,6,br],[3,7,ye],[3,8,bl],[4,1,pi],[4,2,pu],[4,3,bl],[4,4,or],[4,5,br],[4,6,gr],[4,7,re],[4,8,ye],[5,1,ye],[5,2,re],[5,3,gr],[5,4,br],[5,5,or],[5,6,bl],[5,7,pu],[5,8,pi],[6,1,bl],[6,2,ye],[6,3,br],[6,4,pu],[6,5,re],[6,6,or],[6,7,pi],[6,8,gr],[7,1,pu],[7,2,br],[7,3,ye],[7,4,bl],[7,5,gr],[7,6,pi],[7,7,or],[7,8,re],[8,1,br,br,a],[8,2,gr,gr,a],[8,3,re,re,a],[8,4,ye,ye,a],[8,5,pi,pi,a],[8,6,pu,pu,a],[8,7,bl,bl,a],[8,8,or,or,a]])),
 	consult('k2.pl'),consult('ia.pl'),consult('ia_remi.pl'),
 	dessiner,!.
@@ -41,6 +50,8 @@ case(X):-
 /*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_a(T,fo,N):-
+	joueur(LJ),
+	member(a,LJ),
 	plateau(P),
 	member([A,O,_C,T,a],P),
 	couleur(LC),
@@ -48,6 +59,8 @@ deplacer_a(T,fo,N):-
 	accessible(a,T,P,L),
 	NA is A-N,
 	member([NA,O,NC],L),
+	retract(joueur(_)),
+	assert(joueur([b])),
 	retract(couleur(LC)),
 	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,O,T,a,NP),
@@ -55,6 +68,8 @@ deplacer_a(T,fo,N):-
 	assert(plateau(NP)),
 	dessiner,!.
 deplacer_a(T,le,N):-
+	joueur(LJ),
+	member(a,LJ),
 	plateau(P),
 	member([A,O,_C,T,a],P),
 	couleur(LC),
@@ -63,6 +78,8 @@ deplacer_a(T,le,N):-
 	NA is A-N,
 	NO is O-N,
 	member([NA,NO,NC],L),
+	retract(joueur(_)),
+	assert(joueur([b])),
 	retract(couleur(LC)),
 	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
@@ -70,6 +87,8 @@ deplacer_a(T,le,N):-
 	assert(plateau(NP)),
 	dessiner,!.
 deplacer_a(T,ri,N):-
+	joueur(LJ),
+	member(a,LJ),
 	plateau(P),
 	member([A,O,_C,T,a],P),
 	couleur(LC),
@@ -78,6 +97,8 @@ deplacer_a(T,ri,N):-
 	NA is A-N,
 	NO is O+N,
 	member([NA,NO,NC],L),
+	retract(joueur(_)),
+	assert(joueur([b])),
 	retract(couleur(LC)),
 	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,a,NP),
@@ -88,6 +109,8 @@ deplacer_a(T,ri,N):-
 /*Déplacement d'une tour du joueur b et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_b(T,fo,N):-
+	joueur(LJ),
+	member(b,LJ),
 	plateau(P),
 	member([A,O,_C,T,b],P),
 	couleur(LC),
@@ -95,6 +118,8 @@ deplacer_b(T,fo,N):-
 	accessible(b,T,P,L),
 	NA is A+N,
 	member([NA,O,NC],L),
+	retract(joueur(_)),
+	assert(joueur([a])),
 	retract(couleur(LC)),
 	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,O,T,b,NP),
@@ -102,6 +127,8 @@ deplacer_b(T,fo,N):-
 	assert(plateau(NP)),
 	dessiner,!.
 deplacer_b(T,le,N):-
+	joueur(LJ),
+	member(b,LJ),
 	plateau(P),
 	member([A,O,_C,T,b],P),
 	couleur(LC),
@@ -110,6 +137,8 @@ deplacer_b(T,le,N):-
 	NA is A+N,
 	NO is O-N,
 	member([NA,NO,NC],L),
+	retract(joueur(_)),
+	assert(joueur([a])),
 	retract(couleur(LC)),
 	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
@@ -117,6 +146,8 @@ deplacer_b(T,le,N):-
 	assert(plateau(NP)),
 	dessiner,!.
 deplacer_b(T,ri,N):-
+	joueur(LJ),
+	member(b,LJ),
 	plateau(P),
 	member([A,O,_C,T,b],P),
 	couleur(LC),
@@ -125,6 +156,8 @@ deplacer_b(T,ri,N):-
 	NA is A+N,
 	NO is O+N,
 	member([NA,NO,NC],L),
+	retract(joueur(_)),
+	assert(joueur([a])),
 	retract(couleur(LC)),
 	assert(couleur([NC])),
 	modifier_plateau(P,A,O,NA,NO,T,b,NP),
@@ -275,8 +308,9 @@ dessiner_plateau([C1,C2,C3,C4,C5,C6,C7,C8|T],N_ligne):-
 
 dessiner:-
 	couleur(LC),
+	joueur(LJ),
 	write(' |   1   |   2   |   3   |   4   |   5   |   6   |   7   |   8   | couleur active : '),write(LC),nl,
-	write('------------------------------------------------------------------'),nl,
+	write('------------------------------------------------------------------ joueur actif : '),write(LJ),nl,
 	plateau(List),
 	dessiner_plateau(List,1).
 
