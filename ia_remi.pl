@@ -1,4 +1,4 @@
-/*Il manque la gestion du coup vide...
+/*Il manque la gestion du coup vide... Verifier ce qu'il se passe quand la liste des jouables est vide
 
 Chercher un moyen d'évaluer le coup optimum pour l'IA...
 peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
@@ -19,7 +19,7 @@ jouer:-
 	assert(couleur([NC])),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	dessiner,!.
+	redessiner,!.
 
 jouer:-
 	joueur(LJ),
@@ -36,15 +36,9 @@ jouer:-
 	plateau(P),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	dessiner,
-	nl,nl,nl,
-	write('                    YY    YY  OOOO  UU  UU      LL      OOOO   OOOO   SSSS  EEEEEE'),nl,
-	write('                    YY    YY OOOOOO UU  UU      LL     OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
-	write('                     YY  YY  OO  OO UU  UU      LL     OO  OO OO  OO SS     EE'),nl,
-	write('                      YYYY   OO  OO UU  UU      LL     OO  OO OO  OO   SS   EEEE'),nl,
-	write('                       YY    OO  OO UU  UU      LL     OO  OO OO  OO     SS EE'),nl,
-	write('                       YY    OOOOOO UUUUUU      LLLLLL OOOOOO OOOOOO SSSSSS EEEEEE'),nl,
-	write('                       YY     OOOO   UUUU       LLLLLL  OOOO   OOOO   SSSS  EEEEEE'),nl,!.
+	redessiner,
+	send(@p, display,new(T, text('YOU LOOSE')), point(660, 120)),
+	send(T, font, font(times, bold, 18)),!.
 
 jouer:-
 	joueur(LJ),
@@ -66,7 +60,7 @@ jouer:-
 	plateau(P),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	dessiner,!.
+	redessiner,!.
 
 /*Choix de la case à jouer dans la liste des jouables ordonnées*/
 choix([],[H|_],_,H):-
