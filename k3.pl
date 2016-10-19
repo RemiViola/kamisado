@@ -57,8 +57,8 @@ tester(A):-
 	A is 1,
 	retract(joueur(_)),
 	retract(couleur(_)),
-	send(@p, display,new(T, text('YOU WIN')), point(660, 120)),
-	send(T, font, font(times, bold, 18)).
+	send(@p, display,new(T, text('YOU WIN')), point(660, 140)),
+	send(T, font, font(times, bold, 40)).
 
 /*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
@@ -300,25 +300,25 @@ accessible_droite_a(A,O,L,P):-
 
 /*dessin du plateau avec XPCE*/
 dessiner_case(P,[A,O,C]):-
-	send(P, display,new(_B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
-	send(_B, radius, 5),
-	send(_B, fill_pattern, colour(C)),!.
+	send(P, display,new(B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
+	send(B, radius, 5),
+	send(B, fill_pattern, colour(C)),!.
 dessiner_case(P,[A,O,C,T,b]):-
-	send(P, display,new(_B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
-	send(_B, radius, 5),
-	send(_B, fill_pattern, colour(C)),
-	send(P, display,new(_T, circle(60)), point(20+(O-1)*80,20+(A-1)*80)),
-	send(_T, fill_pattern, colour(black)),
-	send(P, display,new(_C, circle(40)), point(30+(O-1)*80,30+(A-1)*80)),
-	send(_C, fill_pattern, colour(T)),!.
+	send(P, display,new(B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
+	send(B, radius, 5),
+	send(B, fill_pattern, colour(C)),
+	send(P, display,new(J, circle(60)), point(20+(O-1)*80,20+(A-1)*80)),
+	send(J, fill_pattern, colour(black)),
+	send(P, display,new(TT, circle(40)), point(30+(O-1)*80,30+(A-1)*80)),
+	send(TT, fill_pattern, colour(T)),!.
 dessiner_case(P,[A,O,C,T,a]):-
-	send(P, display,new(_B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
-	send(_B, radius, 5),
-	send(_B, fill_pattern, colour(C)),
-	send(P, display,new(_T, circle(60)), point(20+(O-1)*80,20+(A-1)*80)),
-	send(_T, fill_pattern, colour(white)),
-	send(P, display,new(_C, circle(40)), point(30+(O-1)*80,30+(A-1)*80)),
-	send(_C, fill_pattern, colour(T)),!.
+	send(P, display,new(B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
+	send(B, radius, 5),
+	send(B, fill_pattern, colour(C)),
+	send(P, display,new(J, circle(60)), point(20+(O-1)*80,20+(A-1)*80)),
+	send(J, fill_pattern, colour(white)),
+	send(P, display,new(TT, circle(40)), point(30+(O-1)*80,30+(A-1)*80)),
+	send(TT, fill_pattern, colour(T)),!.
 
 dessiner_plateau([],_).
 dessiner_plateau([C1,C2,C3,C4,C5,C6,C7,C8|T],P):-
@@ -351,30 +351,32 @@ redessiner:-
 ecrire:-
 	joueur([a]),
 	couleur([LC]),
-	send(@p, display,new(T1, text('Joueur actif : blanc')), point(660, 40)),
-	send(@p, display,new(T2, text('Couleur active : ')), point(660, 80)),
-	send(@p, display,new(T3, text(LC)), point(790, 80)),
-	send(T1, font, font(times, bold, 18)),
-	send(T2, font, font(times, bold, 18)),
-	send(T3, font, font(times, bold, 18)).
+	free(@t1),
+	free(@t3),
+	send(@p, display,new(@t1, text('Joueur actif : blanc')), point(660, 40)),
+	send(@p, display,new(@t3, text(LC)), point(790, 80)),
+	send(@t1, font, font(times, bold, 18)),
+	send(@t3, font, font(times, bold, 18)).
 
 ecrire:-
 	joueur([b]),
 	couleur([LC]),
-	send(@p, display,new(T1, text('Joueur actif : noir')), point(660, 40)),
-	send(@p, display,new(T2, text('Couleur active : ')), point(660, 80)),
-	send(@p, display,new(T3, text(LC)), point(790, 80)),
-	send(T1, font, font(times, bold, 18)),
-	send(T2, font, font(times, bold, 18)),
-	send(T3, font, font(times, bold, 18)).
+	free(@t1),
+	free(@t3),
+	send(@p, display,new(@t1, text('Joueur actif : noir')), point(660, 40)),
+	send(@p, display,new(@t3, text(LC)), point(790, 80)),
+	send(@t1, font, font(times, bold, 18)),
+	send(@t3, font, font(times, bold, 18)).
 
 ecrire:-
 	couleur(LC),
 	joueur(LJ),
-	send(@p, display,new(T1, text('Joueur actif : ')), point(660, 40)),
-	send(@p, display,new(T2, text('Couleur active : ')), point(660, 80)),
-	send(T1, font, font(times, bold, 18)),
-	send(T2, font, font(times, bold, 18)).
+	send(@p, display,new(@t1, text('Joueur actif : ')), point(660, 40)),
+	send(@p, display,new(@t2, text('Couleur active : ')), point(660, 80)),
+	send(@p, display,new(@t3, text('')), point(790, 80)),
+	send(@t1, font, font(times, bold, 18)),
+	send(@t2, font, font(times, bold, 18)),
+	send(@t3, font, font(times, bold, 18)).
 
 
 

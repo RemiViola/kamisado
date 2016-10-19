@@ -37,8 +37,8 @@ jouer:-
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	redessiner,
-	send(@p, display,new(T, text('YOU LOOSE')), point(660, 120)),
-	send(T, font, font(times, bold, 18)),!.
+	send(@p, display,new(T, text('YOU LOOSE')), point(660, 140)),
+	send(T, font, font(times, bold, 40)),!.
 
 jouer:-
 	joueur(LJ),
