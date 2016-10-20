@@ -46,6 +46,18 @@ tester(A):-
 	send(@p, display,new(T, text('YOU WIN')), point(660, 140)),
 	send(T, font, font(times, bold, 40)).
 
+/*Déplacement d'une tour et modification du plateau connaissant les coordonnées d'arrivée
+Attention ne s'occupe pas de la mise à jour des variables globales car sert à la base pour ia_remi...*/
+deplacer2(J,T,NA,NO,NP,NC):-
+	plateau(P),
+	member([A,O,_C,T,J],P),
+	couleur(LC),
+	member(T,LC),
+	accessible(J,T,P,L),
+	member([NA,NO,NC],L),
+	modifier_plateau(P,A,O,NA,NO,T,J,NP),
+	/*dessiner_plateau(NP,1),*/!.
+
 /*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_a(T,fo,N):-
@@ -355,7 +367,7 @@ ecrire:-
 	send(@t3, font, font(times, bold, 18)).
 
 ecrire:-
-	couleur([X,Y|T]),
+	couleur([_,_|_]),
 	joueur([a,b]),
 	send(@p, display,new(@t1, text('Joueur actif : ')), point(660, 40)),
 	send(@p, display,new(@t2, text('Couleur active : ')), point(660, 80)),

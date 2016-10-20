@@ -12,7 +12,7 @@ jouer:-
 	plateau(P),
 	member([A,O,_,C,b],P),
 	NA is A+1,
-	deplacer2(C,NA,O,NP,NC),
+	deplacer2(b,C,NA,O,NP,NC),
 	retract(joueur(_)),
 	assert(joueur([a])),
 	retract(couleur([C,CC|T])),
@@ -28,7 +28,7 @@ jouer:-
 	plateau(P),
 	accessible(b,C,P,L_accessible),
 	member([8,O,NC],L_accessible),
-	deplacer2(C,8,O,NP,NC),
+	deplacer2(b,C,8,O,NP,NC),
 	retract(joueur(_)),
 	assert(joueur([])),
 	retract(couleur([C])),
@@ -48,7 +48,7 @@ jouer:-
 	my_sort(L_jouable,L_sort),
 	choix(L_sort,L_sort,C,X),
 	X = [A,O,NC],
-	deplacer2(C,A,O,NP,NC),
+	deplacer2(b,C,A,O,NP,NC),
 	retract(joueur(_)),
 	assert(joueur([a])),
 	retract(couleur([C])),
@@ -64,13 +64,13 @@ choix([],[H|_],_,H):-
 choix([H|_],_,Tour,H):-
 	/*write('test de '),write(H),nl,*/
 	H = [A,O,_],
-	deplacer2(Tour,A,O,NP,_),
+	deplacer2(b,Tour,A,O,NP,_),
 	accessible(b,Tour,NP,Liste_accessible),write(Liste_accessible),nl,nl,
 	member([8,_,_],Liste_accessible),!.
 choix([H|T],L,Tour,HH):-
 	/*write('test2 de '),write(H),nl,*/
 	H = [A,O,_],
-	deplacer2(Tour,A,O,NP,_),
+	deplacer2(b,Tour,A,O,NP,_),
 	accessible(b,Tour,NP,Liste_accessible),write(Liste_accessible),nl,nl,
 	not(member([8,_,_],Liste_accessible)),
 	choix(T,L,Tour,HH),!.
@@ -89,13 +89,13 @@ tester_liste(Tour,[H|T],L):-
 
 tester_case(Tour,X,[]):-
 	X = [A,O,_],
-	deplacer2(Tour,A,O,NP,NC),
+	deplacer2(b,Tour,A,O,NP,NC),
 	accessible(a,NC,NP,LL),
 	member([1,_,_],LL)/*,
 	write(X),write(' pas bon'),nl*/.
 tester_case(Tour,X,L):-
 	X = [A,O,_],
-	deplacer2(Tour,A,O,NP,NC),
+	deplacer2(b,Tour,A,O,NP,NC),
 	accessible(a,NC,NP,LL),
 	not(member([1,_,_],LL)),
 	/*write(X),write(' bon'),nl,*/
@@ -357,16 +357,7 @@ my_merge([H1,H3|T1],[H2,H4|T2],L):-
 	O2 < O1,
 	append([H2,H4,H1],LL,L),!.
 
-/*simule un déplacement et retourne un plateau provisoire et la couleur correspondante*/
-deplacer2(T,NA,NO,NP,NC):-
-	plateau(P),
-	member([A,O,_C,T,b],P),
-	couleur(LC),
-	member(T,LC),
-	accessible(b,T,P,L),
-	member([NA,NO,NC],L),
-	modifier_plateau(P,A,O,NA,NO,T,b,NP),
-	/*dessiner_plateau(NP,1),*/!.
+
 	
 
 
