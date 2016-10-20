@@ -20,8 +20,7 @@ liste_coup([[A,O,X]|L],L_):-
     L_ = [[A,O,X]|L_2].
     
 
-meilleur_coup(_,[],[],0):-
-    nl,nl,nl,nl,nl,nl,nl,nl.
+meilleur_coup(_,[],[],0).
 meilleur_coup(C,[[A,O,NC]|L],L_,N):-
     deplacer2(b,C,A,O,NP,NC), /* NP = nouveau plateau, après déplacement virtuel*/
     liste_couleur_bloquee(a,NP,NLCB), /* NLCB = nouveau LCB, après déplacement virtuel*/
@@ -41,7 +40,7 @@ meilleur_coup(C,[[A,O,NC]|L],L_,N):-
 
     meilleur_coup(C,L,L_2,N_), /*test de tout les autres déplacements*/
 
-    N_ >= NNBCB, /*coup en cour meuilleurmoins bon que le coup actuel*/
+    N_ >= NNBCB, /*coup en cour moins bon que le coup actuel*/
     N = N_,
     L_ = L_2. /*on transmet ce coup*/
     
