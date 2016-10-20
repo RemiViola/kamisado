@@ -45,12 +45,8 @@ jouer:-
 	member(b,LJ),
 	couleur([C]),
 	jouable(b,C,L_jouable),
-	/*write('Couleur active : '),write(C),nl,
-	write('Liste des cases jouables sans risque : '),write(L_jouable),nl,*/
 	my_sort(L_jouable,L_sort),
-	/*write('Liste des cases jouables triée : '),write(L_sort),nl,*/
 	choix(L_sort,L_sort,C,X),
-	/*write('Choix fait'),write(X),nl,*/
 	X = [A,O,NC],
 	deplacer2(C,A,O,NP,NC),
 	retract(joueur(_)),

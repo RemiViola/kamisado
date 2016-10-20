@@ -4,9 +4,6 @@
 	les couleurs sont orange(orange), bleu(blue), violet(purple), rose(pink), jaune(yellow), rouge(red), vert(green) et marron(brown)
 	les directions de déplacement sont gauche(le), avant(fo) et droite(ri)
 
-
-Il manque la gestion de la victoire du joueur...
-
 */
 
 /*Le plateau modifiable*/
@@ -33,17 +30,6 @@ couleur([orange,blue,purple,pink,yellow,red,green,brown]).
 joueur([a,b]).
 
 /*La gestion de la fenetre*/
-
-/*Pour recharger le plateau*/
-recharger:-
-	retract(joueur(_)),
-	retract(couleur(_)),
-	retract(plateau(_)),
-	assert(joueur([a,b])),
-	assert(couleur([orange,blue,purple,pink,yellow,red,green,brown])),
-	assert(plateau([[1,1,orange,orange,b],[1,2,blue,blue,b],[1,3,purple,purple,b],[1,4,pink,pink,b],[1,5,yellow,yellow,b],[1,6,red,red,b],[1,7,green,green,b],[1,8,brown,brown,b],[2,1,red],[2,2,orange],[2,3,pink],[2,4,green],[2,5,blue],[2,6,yellow],[2,7,brown],[2,8,purple],[3,1,green],[3,2,pink],[3,3,orange],[3,4,red],[3,5,purple],[3,6,brown],[3,7,yellow],[3,8,blue],[4,1,pink],[4,2,purple],[4,3,blue],[4,4,orange],[4,5,brown],[4,6,green],[4,7,red],[4,8,yellow],[5,1,yellow],[5,2,red],[5,3,green],[5,4,brown],[5,5,orange],[5,6,blue],[5,7,purple],[5,8,pink],[6,1,blue],[6,2,yellow],[6,3,brown],[6,4,purple],[6,5,red],[6,6,orange],[6,7,pink],[6,8,green],[7,1,purple],[7,2,brown],[7,3,yellow],[7,4,blue],[7,5,green],[7,6,pink],[7,7,orange],[7,8,red],[8,1,brown,brown,a],[8,2,green,green,a],[8,3,red,red,a],[8,4,yellow,yellow,a],[8,5,pink,pink,a],[8,6,purple,purple,a],[8,7,blue,blue,a],[8,8,orange,orange,a]])),
-	consult('k3.pl'),consult('ia.pl'),consult('ia_remi.pl'),
-	redessiner,!.
 
 case(X):-
 	plateau(L),
@@ -369,8 +355,8 @@ ecrire:-
 	send(@t3, font, font(times, bold, 18)).
 
 ecrire:-
-	couleur(LC),
-	joueur(LJ),
+	couleur([X,Y|T]),
+	joueur([a,b]),
 	send(@p, display,new(@t1, text('Joueur actif : ')), point(660, 40)),
 	send(@p, display,new(@t2, text('Couleur active : ')), point(660, 80)),
 	send(@p, display,new(@t3, text('')), point(790, 80)),
