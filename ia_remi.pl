@@ -58,6 +58,41 @@ jouer:-
 	assert(plateau(NP)),
 	redessiner,!.
 
+jouer:-
+	joueur(LJ),
+	member(b,LJ),
+	couleur([C]),
+	jouable(b,C,L_jouable),
+	L_jouable = [],
+	plateau(P),
+	accessible(b,C,P,L_accessible),
+	member(X,L_accessible),
+	X = [A,O,NC],
+	deplacer2(b,C,A,O,NP,NC),
+	retract(joueur(_)),
+	assert(joueur([a])),
+	retract(couleur([C])),
+	assert(couleur([NC])),
+	retract(plateau(P)),
+	assert(plateau(NP)),
+	write('Noir sait qu\'il a perdu'),nl,
+	redessiner,!.
+
+jouer:-
+	joueur(LJ),
+	member(b,LJ),
+	couleur([C]),
+	plateau(P),
+	accessible(b,C,P,L_accessible),
+	L_accessible = [],
+	member([_,_,NC,C,b],P),
+	retract(joueur(_)),
+	assert(joueur([a])),
+	retract(couleur([C])),
+	assert(couleur([NC])),
+	write('Noir ne peut pas jouer car il est bloqué'),nl,
+	redessiner,!.
+
 /*Choix de la case à jouer dans la liste des jouables ordonnées*/
 choix([],[H|_],_,H):-
 	/*write('arrivé à la fin de liste jouable'),nl,*/!.
