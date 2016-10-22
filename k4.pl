@@ -2,9 +2,11 @@
 	une case occupée est représentée par une liste [ligne,colonne,couleur,tour,joueur]
 	les joueurs sont a et b
 	les couleurs sont orange(orange), bleu(blue), violet(purple), rose(pink), jaune(yellow), rouge(red), vert(green) et marron(brown)
-	les directions de déplacement sont gauche(le), avant(fo) et droite(ri)
+	les directions de déplacement sont gauche(left), avant(forward) et droite(right)
 
 */
+
+:- use_module(library(pce)).
 
 /*Le plateau modifiable*/
 :-dynamic(plateau/1).
@@ -60,7 +62,8 @@ deplacer2(J,T,NA,NO,NP,NC):-
 
 /*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
-deplacer_a(T,fo,N):-
+deplacer_a(T,forward,N):-
+	write('je rentre '),write(T),
 	joueur(LJ),
 	member(a,LJ),
 	plateau(P),
@@ -79,7 +82,7 @@ deplacer_a(T,fo,N):-
 	assert(plateau(NP)),
 	redessiner,
 	tester(NA),!.
-deplacer_a(T,le,N):-
+deplacer_a(T,left,N):-
 	joueur(LJ),
 	member(a,LJ),
 	plateau(P),
@@ -99,7 +102,7 @@ deplacer_a(T,le,N):-
 	assert(plateau(NP)),
 	redessiner,
 	tester(NA),!.
-deplacer_a(T,ri,N):-
+deplacer_a(T,right,N):-
 	joueur(LJ),
 	member(a,LJ),
 	plateau(P),
@@ -122,7 +125,7 @@ deplacer_a(T,ri,N):-
 
 /*Déplacement d'une tour du joueur b et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
-deplacer_b(T,fo,N):-
+deplacer_b(T,forward,N):-
 	joueur(LJ),
 	member(b,LJ),
 	plateau(P),
@@ -140,7 +143,7 @@ deplacer_b(T,fo,N):-
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	redessiner,!.
-deplacer_b(T,le,N):-
+deplacer_b(T,left,N):-
 	joueur(LJ),
 	member(b,LJ),
 	plateau(P),
@@ -159,7 +162,7 @@ deplacer_b(T,le,N):-
 	retract(plateau(P)),
 	assert(plateau(NP)),
 	redessiner,!.
-deplacer_b(T,ri,N):-
+deplacer_b(T,right,N):-
 	joueur(LJ),
 	member(b,LJ),
 	plateau(P),
@@ -296,7 +299,7 @@ accessible_droite_a(A,O,L,P):-
 	member([A,O,X],P),
 	append([[A,O,X]],LL,L).
 
-/*dessin du plateau avec XPCE*/
+/*dessin du plateau avec XPCE*//*deplacer2(J,T,NA,NO,NP,NC)*/
 dessiner_case(P,[A,O,C]):-
 	send(P, display,new(B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
 	send(B, radius, 5),
@@ -315,7 +318,9 @@ dessiner_case(P,[A,O,C,T,a]):-
 	send(P, display,new(J, circle(60)), point(20+(O-1)*80,20+(A-1)*80)),
 	send(J, pen, 10),
 	send(J, fill_pattern, colour(T)),
-	send(J, colour(white)),!.
+	send(J, colour(white)),
+	new(K, click_gesture(left, '', double,message(@prolog, gestion, @receiver))),
+	send(J, recogniser, K),!.
 
 dessiner_plateau([],_).
 dessiner_plateau([C1,C2,C3,C4,C5,C6,C7,C8|T],P):-
@@ -375,7 +380,23 @@ ecrire:-
 	send(@t2, font, font(times, bold, 18)),
 	send(@t3, font, font(times, bold, 18)).
 
-
+gestion(Gr):-
+	couleur(C),
+	new(D, dialog(string('Deplacement de la tour %s de %s :', Gr?fill_pattern,Gr?colour))),
+	send(D, append, new(Coul, menu(couleur))),
+	send(D, append, new(Dir, menu(direction))),
+	send(D, append, new(Nb, menu(valeur))),
+	send_list(Coul, append, C),
+	send_list(Dir, append, [forward, left, right]),
+	send_list(Nb, append, [1,2,3,4,5,6]),
+	send(D, append, button(enter, and(message(@prolog,deplacer_a,
+		Coul?selection,
+		Dir?selection,
+		Nb?selection),
+		and(message(@prolog,jouer),message(D, destroy))))),
+	send(D, append, button(quit, message(D, destroy))),
+	send(D, default_button, enter),
+	send(D, open).
 
 
 
