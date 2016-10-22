@@ -4,6 +4,7 @@
 	les couleurs sont orange(orange), bleu(blue), violet(purple), rose(pink), jaune(yellow), rouge(red), vert(green) et marron(brown)
 	les directions de déplacement sont gauche(left), avant(forward) et droite(right)
 
+	pensez à améliorer la modification deplateau avec subtract... cf session4
 */
 
 :- use_module(library(pce)).
@@ -63,7 +64,6 @@ deplacer2(J,T,NA,NO,NP,NC):-
 /*Déplacement d'une tour du joueur a et modification du plateau
 deplacer(Tour,Direction,Nb_Case)*/
 deplacer_a(T,forward,N):-
-	write('je rentre '),write(T),
 	joueur(LJ),
 	member(a,LJ),
 	plateau(P),
@@ -299,7 +299,7 @@ accessible_droite_a(A,O,L,P):-
 	member([A,O,X],P),
 	append([[A,O,X]],LL,L).
 
-/*dessin du plateau avec XPCE*//*deplacer2(J,T,NA,NO,NP,NC)*/
+/*dessin du plateau avec XPCE*/
 dessiner_case(P,[A,O,C]):-
 	send(P, display,new(B, box(80,80)), point(10+(O-1)*80,10+(A-1)*80)),
 	send(B, radius, 5),
@@ -389,11 +389,15 @@ gestion(Gr):-
 	send_list(Coul, append, C),
 	send_list(Dir, append, [forward, left, right]),
 	send_list(Nb, append, [1,2,3,4,5,6]),
-	send(D, append, button(enter, and(message(@prolog,deplacer_a,
-		Coul?selection,
-		Dir?selection,
-		Nb?selection),
-		and(message(@prolog,jouer),message(D, destroy))))),
+	send(D, append, button(enter, 
+		and(
+			and(
+				message(@prolog,deplacer_a,Coul?selection,Dir?selection,Nb?selection),
+				message(D, destroy)
+			),
+			message(@prolog,jouer)
+		)
+	)),
 	send(D, append, button(quit, message(D, destroy))),
 	send(D, default_button, enter),
 	send(D, open).

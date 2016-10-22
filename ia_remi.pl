@@ -1,6 +1,4 @@
-/*Il manque la gestion du coup vide... Verifier ce qu'il se passe quand la liste des jouables est vide
-
-Chercher un moyen d'évaluer le coup optimum pour l'IA...
+/*Chercher un moyen d'évaluer le coup optimum pour l'IA...
 peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
 Choisir dans ce cas le meilleur ratio ?*/
 
@@ -75,7 +73,6 @@ jouer:-
 	assert(couleur([NC])),
 	retract(plateau(P)),
 	assert(plateau(NP)),
-	write('Noir sait qu\'il a perdu'),nl,
 	redessiner,!.
 
 jouer:-
@@ -90,20 +87,16 @@ jouer:-
 	assert(joueur([a])),
 	retract(couleur([C])),
 	assert(couleur([NC])),
-	write('Noir ne peut pas jouer car il est bloqué'),nl,
 	redessiner,!.
 
 /*Choix de la case à jouer dans la liste des jouables ordonnées*/
-choix([],[H|_],_,H):-
-	/*write('arrivé à la fin de liste jouable'),nl,*/!.
+choix([],[H|_],_,H):-!.
 choix([H|_],_,Tour,H):-
-	/*write('test de '),write(H),nl,*/
 	H = [A,O,_],
 	deplacer2(b,Tour,A,O,NP,_),
 	accessible(b,Tour,NP,Liste_accessible),write(Liste_accessible),nl,nl,
 	member([8,_,_],Liste_accessible),!.
 choix([H|T],L,Tour,HH):-
-	/*write('test2 de '),write(H),nl,*/
 	H = [A,O,_],
 	deplacer2(b,Tour,A,O,NP,_),
 	accessible(b,Tour,NP,Liste_accessible),write(Liste_accessible),nl,nl,
@@ -126,28 +119,22 @@ tester_case(Tour,X,[]):-
 	X = [A,O,_],
 	deplacer2(b,Tour,A,O,NP,NC),
 	accessible(a,NC,NP,LL),
-	member([1,_,_],LL)/*,
-	write(X),write(' pas bon'),nl*/.
+	member([1,_,_],LL).
 tester_case(Tour,X,L):-
 	X = [A,O,_],
 	deplacer2(b,Tour,A,O,NP,NC),
 	accessible(a,NC,NP,LL),
 	not(member([1,_,_],LL)),
-	/*write(X),write(' bon'),nl,*/
 	append([X],[],L).
 
 /*Tri de la liste de cases*/
 my_sort([],[]):-!.
 my_sort([X],[X]):-!.
 my_sort(L,LS):-
-	/*write('split de : '),write(L),nl,*/
 	my_split(L,L1,L2),
-	/*write('split fait : '),write(L1),write(' et '),write(L2),nl,*/
 	my_sort(L1,LS1),
 	my_sort(L2,LS2),
-	/*write('merge de : '),write(LS1),write(' et '),write(LS2),nl,*/
-	my_merge(LS1,LS2,LS)/*,
-	write('merge fait : '),write(LS),nl*/.
+	my_merge(LS1,LS2,LS).
 
 my_split([],[],[]):-!.
 my_split([X],[X],[]):-!.
