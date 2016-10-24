@@ -25,7 +25,7 @@ plateau([
 /*La gestion de la couleur courante*/
 :-dynamic(couleur/1).
 
-couleur([orange,blue,purple,pink,yellow,red,green,brown]).
+couleur([brown,green,red,yellow,pink,purple,blue,orange]).
 
 /*La gestion du joueur courant*/
 :-dynamic(joueur/1).
@@ -388,7 +388,7 @@ gestion(Gr):-
 	send(D, append, new(Nb, menu(valeur))),
 	send_list(Coul, append, C),
 	send_list(Dir, append, [forward, left, right]),
-	send_list(Nb, append, [1,2,3,4,5,6]),
+	send_list(Nb, append, [1,2,3,4,5,6,7]),
 	send(D, append, button(enter, 
 		and(
 			and(
