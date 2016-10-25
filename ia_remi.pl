@@ -1,8 +1,11 @@
-/*Chercher un moyen d'évaluer le coup optimum pour l'IA...
-peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
-Choisir dans ce cas le meilleur ratio ?*/
+/*	Chercher un moyen d'évaluer le coup optimum pour l'IA...
+	peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
+	Choisir dans ce cas le meilleur ratio ?
+	
+	regler le probleme du coup gagnant
+*/
 
-/*Prédicat de gestion de l'IA, premier coup, suivants et victoire...*/
+/*Gestion du premier coup de l'ia*/
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
@@ -19,6 +22,7 @@ jouer:-
 	assert(plateau(NPlateau)),
 	redessiner,!.
 
+/*Quand une case gagnante est dans la liste des accessibles                                                              ici */
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
@@ -38,6 +42,7 @@ jouer:-
 	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)),!.
 
+/*L'ia choisit le meilleur coup dans la liste des jouables, sinon elle prend le premier de la liste*/
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
@@ -57,6 +62,7 @@ jouer:-
 	assert(plateau(NPlateau)),
 	redessiner,!.
 
+/*Quand l'ia n'a pas de coup jouable sans risque et qu'elle sait qu'elle a perdu*/
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
@@ -76,6 +82,7 @@ jouer:-
 	assert(plateau(NPlateau)),
 	redessiner,!.
 
+/*Quand l'ia est bloquée et ne peut pas se déplacer*/
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
