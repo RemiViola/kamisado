@@ -98,7 +98,7 @@ jouer:-
 	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)),!.
 
-/*L'ia choisit le meilleur coup dans la liste des jouables, sinon elle prend le premier de la liste*/
+/*L'ia choisit le meilleur coup dans la liste des jouables*/
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
@@ -154,7 +154,9 @@ jouer:-
 	redessiner,!.
 
 /*Choix de la case à jouer dans la liste des jouables ordonnées*/
-choix([],[Case|_],_,Case):-!.
+choix([],L_save,Tour,Case):-
+	write('entrer dans choix2'),nl,
+	choix2(L_save,L_save,Tour,Case),!.
 choix([Case|_],_,Tour,Case):-
 	Case = [Ligne,Colonne,_],
 	deplacer2(b,Tour,Ligne,Colonne,NPlateau,_),
@@ -166,6 +168,36 @@ choix([Case|Tail],L_save,Tour,Case2):-
 	accessible(b,Tour,NPlateau,L_accessible),
 	not(member([8,_,_],L_accessible)),
 	choix(Tail,L_save,Tour,Case2),!.
+
+/*Comme choix ne permet pas d'accéder à une case agressive, 
+on essaie de forcer le joueur a à libérer une case gagnante, 
+sinon on prend le premier de la liste*/
+choix2([],[Case|_],_,Case):-!.
+choix2([Case|_],_,_,Case):-
+	Case = [_,Colonne,Couleur],
+	plateau(NPlateau),
+	member([8,Colonne,Couleur,Couleur,a],NPlateau),!.
+choix2([Case|_],_,_,Case):-
+	Case = [Ligne,Colonne,Couleur],
+	plateau(NPlateau),
+	NColonne is Colonne+8-Ligne,
+	NColonne > 0, NColonne < 9,
+	member([8,NColonne,Couleur,Couleur,a],NPlateau),!.
+choix2([Case|_],_,_,Case):-
+	Case = [Ligne,Colonne,Couleur],
+	plateau(NPlateau),
+	NColonne is Colonne-8+Ligne,
+	NColonne > 0, NColonne < 9,
+	member([8,NColonne,Couleur,Couleur,a],NPlateau),!.
+choix2([Case|Tail],L_save,Tour,Case2):-
+	Case = [Ligne,Colonne,Couleur],
+	plateau(NPlateau),
+	not(member([8,Colonne,Couleur,Couleur,a],NPlateau)),
+	NColonne is Colonne+8-Ligne,
+	not(member([8,NColonne,Couleur,Couleur,a],NPlateau)),
+	NColonne_ is Colonne-8+Ligne,
+	not(member([8,NColonne_,Couleur,Couleur,a],NPlateau)),
+	choix2(Tail,L_save,Tour,Case2),!.
 
 /*Liste des cases où b peut jouer sans risque direct*/	
 jouable(b,L_accessible,Tour,L_jouable):-
