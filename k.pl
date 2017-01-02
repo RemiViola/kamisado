@@ -47,6 +47,25 @@ tester(Ligne):-
 	send(@p, display,new(Text, text('YOU WIN')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)).
 
+/*Passer en cas de tour bloquée*/
+passer:-
+	joueur([a]),
+	plateau(Plateau),
+	member([_,_,Case,_,a],Plateau),
+	retract(couleur(_)),
+	assert(couleur([Case])),
+	retract(joueur(_)),
+	assert(joueur([b])),!.
+
+passer:-
+	joueur([b]),
+	plateau(Plateau),
+	member([_,_,Case,_,b],Plateau),
+	retract(couleur(_)),
+	assert(couleur([Case])),
+	retract(joueur(_)),
+	assert(joueur([a])),!.
+
 /*Déplacement d'une tour et modification du plateau connaissant les coordonnées d'arrivée
 Attention ne s'occupe pas de la mise à jour des variables globales*/
 deplacer2(Joueur,Tour,NLigne,NColonne,NPlateau,NCouleur):-
@@ -338,6 +357,16 @@ commencer:-
 	dessiner_plateau(Plateau,@p),
 	send(@p, open).
 
+ia_commencer:-
+	new(@p, picture('KAMISADO')),
+	send(@p, size, size(900,640)),
+	assert(fenetre(@p)),
+	ecrire,
+	plateau(Plateau),
+	dessiner_plateau(Plateau,@p),
+	send(@p, open),
+	jouer.
+
 redessiner:-
 	fenetre(Plateau),
 	ecrire,
@@ -375,8 +404,56 @@ ecrire:-
 	send(@t2, font, font(times, bold, 18)),
 	send(@t3, font, font(times, bold, 18)).
 
+/*gestion(_Conteneur):-
+	couleur(Couleur),
+	send(@p, display, new(@mCouleur, menu(couleur)), point(790,120)),
+	send(@p, display, new(Direction, menu(direction)),point(660,120)),
+	send(@p, display, new(Nb_case, menu(valeur)),point(660,210)),
+	send(@mCouleur, layout, vertical),
+	send(Direction, layout, vertical),
+	send(Nb_case, layout, vertical),
+	send_list(@mCouleur, append, Couleur),
+	send_list(Direction, append, [forward, left, right]),
+	send_list(Nb_case, append, [1,2,3,4,5,6,7]),
+	send(@p, display, button(enter, 
+		and(
+			message(@prolog,deplacer_a,@mCouleur?selection,Direction?selection,Nb_case?selection),
+			message(@prolog,jouer)
+		)
+	),point(660,400)),
+	send(@p, display, button(quit, message(@p, destroy)), point(790,400)),
+	send(@p, open).*/
+
 gestion(Conteneur):-
 	couleur(Couleur),
+	plateau(Plateau),
+	couleur([C1|_]),
+	accessible(a,C1,Plateau,L_accessible),
+	length(L_accessible,0),
+	new(Dialog, dialog(string('Deplacement de la tour %s de %s :', Conteneur?fill_pattern,Conteneur?colour))),
+	send(Dialog, append, new(MCouleur, menu(couleur))),
+	send(MCouleur, layout, vertical),
+	send_list(MCouleur, append, Couleur),
+	send(Dialog, append, button(pass, 
+		and(
+			and(
+				message(@prolog,passer),
+				message(Dialog, destroy)
+			),
+			message(@prolog,jouer)
+		)
+	)),
+	send(Dialog, append, button(quit, message(Dialog, destroy))),
+	send(Dialog, default_button, pass),
+	send(Dialog, open),!.
+	
+gestion(Conteneur):-
+	couleur(Couleur),
+	couleur([C1|_]),
+	plateau(Plateau),
+	accessible(a,C1,Plateau,L_accessible),
+	length(L_accessible,X),
+	X > 0,
 	new(Dialog, dialog(string('Deplacement de la tour %s de %s :', Conteneur?fill_pattern,Conteneur?colour))),
 	send(Dialog, append, new(MCouleur, menu(couleur))),
 	send(Dialog, append, new(Direction, menu(direction))),
@@ -398,7 +475,7 @@ gestion(Conteneur):-
 	)),
 	send(Dialog, append, button(quit, message(Dialog, destroy))),
 	send(Dialog, default_button, enter),
-	send(Dialog, open).
+	send(Dialog, open),!.
 
 recommencer:-
 	free(@p),
@@ -421,6 +498,26 @@ recommencer:-
 	assert(joueur([a,b])),
 	commencer.
 
+ia_recommencer:-
+	free(@p),
+	free(@t1),
+	free(@t2),
+	free(@t3),
+	retract(plateau(_)),
+	assert(plateau([
+[1,1,orange,orange,b],[1,2,blue,blue,b],[1,3,purple,purple,b],[1,4,pink,pink,b],[1,5,yellow,yellow,b],[1,6,red,red,b],[1,7,green,green,b],[1,8,brown,brown,b],
+[2,1,red],[2,2,orange],[2,3,pink],[2,4,green],[2,5,blue],[2,6,yellow],[2,7,brown],[2,8,purple],
+[3,1,green],[3,2,pink],[3,3,orange],[3,4,red],[3,5,purple],[3,6,brown],[3,7,yellow],[3,8,blue],
+[4,1,pink],[4,2,purple],[4,3,blue],[4,4,orange],[4,5,brown],[4,6,green],[4,7,red],[4,8,yellow],
+[5,1,yellow],[5,2,red],[5,3,green],[5,4,brown],[5,5,orange],[5,6,blue],[5,7,purple],[5,8,pink],
+[6,1,blue],[6,2,yellow],[6,3,brown],[6,4,purple],[6,5,red],[6,6,orange],[6,7,pink],[6,8,green],
+[7,1,purple],[7,2,brown],[7,3,yellow],[7,4,blue],[7,5,green],[7,6,pink],[7,7,orange],[7,8,red],
+[8,1,brown,brown,a],[8,2,green,green,a],[8,3,red,red,a],[8,4,yellow,yellow,a],[8,5,pink,pink,a],[8,6,purple,purple,a],[8,7,blue,blue,a],[8,8,orange,orange,a]])),
+	retract(couleur(_)),
+	assert(couleur([brown,green,red,yellow,pink,purple,blue,orange])),
+	retract(joueur(_)),
+	assert(joueur([a,b])),
+	ia_commencer.
 
 
 

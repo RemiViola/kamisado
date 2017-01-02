@@ -5,15 +5,77 @@
 	regler le probleme du coup gagnant
 */
 
-/*Gestion du premier coup de l'ia*/
+:- use_module(library(random)).
+
+/*Gestion du premier coup de l'ia si elle commence*/
+/*Si brown ou orange */
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur,Couleur2|Tail]),
 	plateau(Plateau),
-	member([Ligne,Colonne,_,Couleur,b],Plateau),
-	NLigne is Ligne+1,
-	deplacer2(b,Couleur,NLigne,Colonne,NPlateau,NCouleur),
+	random_member(X, [Couleur,Couleur2|Tail]),
+	member(X,[brown,orange]),
+	member([_,Colonne,_,X,b],Plateau),	
+	random_member(NLigne, [4,5]),
+	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
+	retract(joueur(_)),
+	assert(joueur([a])),
+	retract(couleur([Couleur,Couleur2|Tail])),
+	assert(couleur([NCouleur])),
+	retract(plateau(Plateau)),
+	assert(plateau(NPlateau)),
+	redessiner,!.
+
+/*Si green ou blue */
+jouer:-
+	joueur(L_joueur),
+	member(b,L_joueur),
+	couleur([Couleur,Couleur2|Tail]),
+	plateau(Plateau),
+	random_member(X, [Couleur,Couleur2|Tail]),
+	member(X,[green,blue]),
+	member([_,Colonne,_,X,b],Plateau),	
+	random_member(NLigne, [2,4,6,7]),
+	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
+	retract(joueur(_)),
+	assert(joueur([a])),
+	retract(couleur([Couleur,Couleur2|Tail])),
+	assert(couleur([NCouleur])),
+	retract(plateau(Plateau)),
+	assert(plateau(NPlateau)),
+	redessiner,!.
+
+/*Si purple ou red */
+jouer:-
+	joueur(L_joueur),
+	member(b,L_joueur),
+	couleur([Couleur,Couleur2|Tail]),
+	plateau(Plateau),
+	random_member(X, [Couleur,Couleur2|Tail]),
+	member(X,[purple,red]),
+	member([_,Colonne,_,X,b],Plateau),	
+	random_member(NLigne, [3,4,6,7]),
+	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
+	retract(joueur(_)),
+	assert(joueur([a])),
+	retract(couleur([Couleur,Couleur2|Tail])),
+	assert(couleur([NCouleur])),
+	retract(plateau(Plateau)),
+	assert(plateau(NPlateau)),
+	redessiner,!.
+
+/*Si pink ou yellow */
+jouer:-
+	joueur(L_joueur),
+	member(b,L_joueur),
+	couleur([Couleur,Couleur2|Tail]),
+	plateau(Plateau),
+	random_member(X, [Couleur,Couleur2|Tail]),
+	member(X,[pink,yellow]),
+	member([_,Colonne,_,X,b],Plateau),	
+	random_member(NLigne, [4,5,6]),
+	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
 	retract(joueur(_)),
 	assert(joueur([a])),
 	retract(couleur([Couleur,Couleur2|Tail])),
@@ -31,10 +93,6 @@ jouer:-
 	accessible(b,Couleur,Plateau,L_accessible),
 	member([8,Colonne,NCouleur],L_accessible),
 	deplacer2(b,Couleur,8,Colonne,NPlateau,NCouleur),
-	retract(joueur(_)),
-	assert(joueur([])),
-	retract(couleur([Couleur])),
-	assert(couleur([])),
 	plateau(Plateau),
 	retract(plateau(Plateau)),
 	assert(plateau(NPlateau)),
