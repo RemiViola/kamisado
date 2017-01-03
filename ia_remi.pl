@@ -94,6 +94,8 @@ jouer:-
 	plateau(Plateau),
 	retract(plateau(Plateau)),
 	assert(plateau(NPlateau)),
+	retract(joueur(_)),
+	retract(couleur(_)),
 	redessiner,
 	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)),!.

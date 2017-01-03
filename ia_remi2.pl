@@ -94,6 +94,8 @@ jouer:-
 	plateau(Plateau),
 	retract(plateau(Plateau)),
 	assert(plateau(NPlateau)),
+	retract(joueur(_)),
+	retract(couleur(_)),
 	redessiner,
 	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)),!.
@@ -155,7 +157,6 @@ jouer:-
 
 /*Choix de la case à jouer dans la liste des jouables ordonnées*/
 choix([],L_save,Tour,Case):-
-	write('entrer dans choix2'),nl,
 	choix2(L_save,L_save,Tour,Case),!.
 choix([Case|_],_,Tour,Case):-
 	Case = [Ligne,Colonne,_],

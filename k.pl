@@ -458,7 +458,10 @@ gestion(Conteneur):-
 	send(Dialog, append, new(MCouleur, menu(couleur))),
 	send(Dialog, append, new(Direction, menu(direction))),
 	send(Dialog, append, new(Nb_case, menu(valeur))),
-	send(MCouleur, layout, vertical),
+	send(MCouleur, layout, vertical),/*
+	S = string('%s',Conteneur?fill_pattern),write(S),nl,
+	atom_string(C,S),
+	send(MCouleur, default, C),*/
 	send(Direction, layout, vertical),
 	send(Nb_case, layout, vertical),
 	send_list(MCouleur, append, Couleur),
