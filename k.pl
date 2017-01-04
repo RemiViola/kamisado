@@ -51,7 +51,7 @@ tester(Ligne):-
 passer:-
 	joueur([a]),
 	plateau(Plateau),
-	couleur(Couleur),
+	couleur([Couleur]),
 	member([_,_,Case,Couleur,a],Plateau),
 	retract(couleur(_)),
 	assert(couleur([Case])),
@@ -61,7 +61,7 @@ passer:-
 passer:-
 	joueur([b]),
 	plateau(Plateau),
-	couleur(Couleur),
+	couleur([Couleur]),
 	member([_,_,Case,Couleur,b],Plateau),
 	retract(couleur(_)),
 	assert(couleur([Case])),
