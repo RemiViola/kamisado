@@ -3,12 +3,18 @@
 	les joueurs sont a et b
 	les couleurs sont orange(orange), bleu(blue), violet(purple), rose(pink), jaune(yellow), rouge(red), vert(green) et marron(brown)
 	les directions de déplacement sont gauche(left), avant(forward) et droite(right)
-
-	pensez à améliorer la modification de plateau avec subtract... cf session4
-	regler le probleme de a bloqué
 */
 
+/*Chargement de la librairie xpce pour l'interface graphique*/
 :- use_module(library(pce)).
+
+/*Chargement des différentes ia*/
+:-use_module(ia_remi).
+:-use_module(ia_mathieu).
+
+
+/*La gestion de l'IA*/
+:-dynamic(ia/1).
 
 /*La gestion de la fenetre*/
 :-dynamic(fenetre/1).
@@ -351,7 +357,8 @@ dessiner_plateau([C1,C2,C3,C4,C5,C6,C7,C8|T],Plateau):-
 	dessiner_plateau(T,Plateau).
 
 /*Pour commencer*/
-commencer:-
+commencer(IA):-
+	assert(ia(IA)),
 	new(@p, picture('KAMISADO')),
 	send(@p, size, size(900,640)),
 	assert(fenetre(@p)),
@@ -361,7 +368,8 @@ commencer:-
 	send(@p, open).
 
 /*Pour faire commencer l'ia choisie*/
-ia_commencer:-
+ia_commencer(IA):-
+	assert(ia(IA)),
 	new(@p, picture('KAMISADO')),
 	send(@p, size, size(900,640)),
 	assert(fenetre(@p)),
@@ -467,10 +475,24 @@ gestion(Conteneur):-
 	send(Dialog, default_button, enter),
 	send(Dialog, open),!.
 
+/*Aiguillage de jouer*/
+jouer:-
+	ia(remi),
+	jouer_remi,!.
+
+jouer:-
+	ia(mathieu),
+	jouer_mat,!.
+
+jouer:-
+	ia(valentin),
+	jouer_val,!.
+
 /*Pour stoper une partie ou en refaire une avec la libération de la mémoire
 et remise en place du plateau et des variables*/
-recommencer:-
+recommencer(IA):-
 	couleur(_),
+	retract(ia(_)),
 	free(@p),
 	free(@t1),
 	free(@t2),
@@ -489,10 +511,11 @@ recommencer:-
 	assert(couleur([brown,green,red,yellow,pink,purple,blue,orange])),
 	retract(joueur(_)),
 	assert(joueur([a,b])),
-	commencer,!.
+	commencer(IA),!.
 
-recommencer:-
+recommencer(IA):-
 	not(couleur(_)),
+	retract(ia(_)),
 	free(@p),
 	free(@t1),
 	free(@t2),
@@ -509,10 +532,11 @@ recommencer:-
 [8,1,brown,brown,a],[8,2,green,green,a],[8,3,red,red,a],[8,4,yellow,yellow,a],[8,5,pink,pink,a],[8,6,purple,purple,a],[8,7,blue,blue,a],[8,8,orange,orange,a]])),
 	assert(couleur([brown,green,red,yellow,pink,purple,blue,orange])),
 	assert(joueur([a,b])),
-	commencer,!.
+	commencer(IA),!.
 
-ia_recommencer:-	
+ia_recommencer(IA):-
 	couleur(_),
+	retract(ia(_)),
 	free(@p),
 	free(@t1),
 	free(@t2),
@@ -531,10 +555,11 @@ ia_recommencer:-
 	assert(couleur([brown,green,red,yellow,pink,purple,blue,orange])),
 	retract(joueur(_)),
 	assert(joueur([a,b])),
-	ia_commencer,!.
+	ia_commencer(IA),!.
 
-ia_recommencer:-
+ia_recommencer(IA):-
 	not(couleur(_)),
+	retract(ia(_)),
 	free(@p),
 	free(@t1),
 	free(@t2),
@@ -551,5 +576,5 @@ ia_recommencer:-
 [8,1,brown,brown,a],[8,2,green,green,a],[8,3,red,red,a],[8,4,yellow,yellow,a],[8,5,pink,pink,a],[8,6,purple,purple,a],[8,7,blue,blue,a],[8,8,orange,orange,a]])),
 	assert(couleur([brown,green,red,yellow,pink,purple,blue,orange])),
 	assert(joueur([a,b])),
-	ia_commencer,!.
+	ia_commencer(IA),!.
 

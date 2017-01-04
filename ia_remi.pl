@@ -1,7 +1,9 @@
+:-module(ia_remi,[jouer_remi/0]).
+
 :- use_module(library(random)).
 
 /*Gestion du premier coup de l'ia si elle commence*/
-jouer:-
+jouer_remi:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur,Couleur2|Tail]),
@@ -22,7 +24,7 @@ jouer:-
 	redessiner,!.
 
 /*Quand une case gagnante est dans la liste des accessibles*/
-jouer:-
+jouer_remi:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur]),
@@ -33,11 +35,13 @@ jouer:-
 	retract(plateau(Plateau)),
 	assert(plateau(NPlateau)),
 	redessiner,
+	retract(joueur(_)),
+	retract(couleur(_)),
 	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)),!.
 
-/*L'ia choisit le meilleur coup dans la liste des jouables, sinon elle prend le premier de la liste*/
-jouer:-
+/*L'ia choisit le meilleur coup dans la liste des jouables*/
+jouer_remi:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur]),
@@ -57,7 +61,7 @@ jouer:-
 	redessiner,!.
 
 /*Quand l'ia n'a pas de coup jouable sans risque et qu'elle sait qu'elle a perdu*/
-jouer:-
+jouer_remi:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur]),
@@ -77,7 +81,7 @@ jouer:-
 	redessiner,!.
 
 /*Quand l'ia est bloquée et ne peut pas se déplacer*/
-jouer:-
+jouer_remi:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur]),
@@ -92,7 +96,8 @@ jouer:-
 	redessiner,!.
 
 /*Choix de la case à jouer dans la liste des jouables ordonnées*/
-choix([],[Case|_],_,Case):-!.
+choix([],L_save,Tour,Case):-
+	choix2(L_save,L_save,Tour,Case),!.
 choix([Case|_],_,Tour,Case):-
 	Case = [Ligne,Colonne,_],
 	deplacer2(b,Tour,Ligne,Colonne,NPlateau,_),
@@ -104,6 +109,36 @@ choix([Case|Tail],L_save,Tour,Case2):-
 	accessible(b,Tour,NPlateau,L_accessible),
 	not(member([8,_,_],L_accessible)),
 	choix(Tail,L_save,Tour,Case2),!.
+
+/*Comme choix ne permet pas d'accéder à une case agressive, 
+on essaie de forcer le joueur a à libérer une case gagnante, 
+sinon on prend le premier de la liste*/
+choix2([],[Case|_],_,Case):-!.
+choix2([Case|_],_,_,Case):-
+	Case = [_,Colonne,Couleur],
+	plateau(NPlateau),
+	member([8,Colonne,Couleur,Couleur,a],NPlateau),!.
+choix2([Case|_],_,_,Case):-
+	Case = [Ligne,Colonne,Couleur],
+	plateau(NPlateau),
+	NColonne is Colonne+8-Ligne,
+	NColonne > 0, NColonne < 9,
+	member([8,NColonne,Couleur,Couleur,a],NPlateau),!.
+choix2([Case|_],_,_,Case):-
+	Case = [Ligne,Colonne,Couleur],
+	plateau(NPlateau),
+	NColonne is Colonne-8+Ligne,
+	NColonne > 0, NColonne < 9,
+	member([8,NColonne,Couleur,Couleur,a],NPlateau),!.
+choix2([Case|Tail],L_save,Tour,Case2):-
+	Case = [Ligne,Colonne,Couleur],
+	plateau(NPlateau),
+	not(member([8,Colonne,Couleur,Couleur,a],NPlateau)),
+	NColonne is Colonne+8-Ligne,
+	not(member([8,NColonne,Couleur,Couleur,a],NPlateau)),
+	NColonne_ is Colonne-8+Ligne,
+	not(member([8,NColonne_,Couleur,Couleur,a],NPlateau)),
+	choix2(Tail,L_save,Tour,Case2),!.
 
 /*Liste des cases où b peut jouer sans risque direct*/	
 jouable(b,L_accessible,Tour,L_jouable):-
@@ -378,25 +413,3 @@ my_merge([H1,H3|T1],[H2,H4|T2],L):-
 	Colonne4 < Colonne2,
 	Colonne2 < Colonne1,
 	append([H2,H4,H1],L_intermediaire,L),!.
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
