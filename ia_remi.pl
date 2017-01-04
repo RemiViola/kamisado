@@ -6,74 +6,18 @@
 :- use_module(library(random)).
 
 /*Gestion du premier coup de l'ia si elle commence*/
-/*Si brown ou orange */
 jouer:-
 	joueur(L_joueur),
 	member(b,L_joueur),
 	couleur([Couleur,Couleur2|Tail]),
 	plateau(Plateau),
 	random_member(X, [Couleur,Couleur2|Tail]),
-	member(X,[brown,orange]),
-	member([_,Colonne,_,X,b],Plateau),	
-	random_member(NLigne, [4,5]),
-	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
-	retract(joueur(_)),
-	assert(joueur([a])),
-	retract(couleur([Couleur,Couleur2|Tail])),
-	assert(couleur([NCouleur])),
-	retract(plateau(Plateau)),
-	assert(plateau(NPlateau)),
-	redessiner,!.
-
-/*Si green ou blue */
-jouer:-
-	joueur(L_joueur),
-	member(b,L_joueur),
-	couleur([Couleur,Couleur2|Tail]),
-	plateau(Plateau),
-	random_member(X, [Couleur,Couleur2|Tail]),
-	member(X,[green,blue]),
-	member([_,Colonne,_,X,b],Plateau),	
-	random_member(NLigne, [2,4,6,7]),
-	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
-	retract(joueur(_)),
-	assert(joueur([a])),
-	retract(couleur([Couleur,Couleur2|Tail])),
-	assert(couleur([NCouleur])),
-	retract(plateau(Plateau)),
-	assert(plateau(NPlateau)),
-	redessiner,!.
-
-/*Si purple ou red */
-jouer:-
-	joueur(L_joueur),
-	member(b,L_joueur),
-	couleur([Couleur,Couleur2|Tail]),
-	plateau(Plateau),
-	random_member(X, [Couleur,Couleur2|Tail]),
-	member(X,[purple,red]),
-	member([_,Colonne,_,X,b],Plateau),	
-	random_member(NLigne, [3,4,6,7]),
-	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
-	retract(joueur(_)),
-	assert(joueur([a])),
-	retract(couleur([Couleur,Couleur2|Tail])),
-	assert(couleur([NCouleur])),
-	retract(plateau(Plateau)),
-	assert(plateau(NPlateau)),
-	redessiner,!.
-
-/*Si pink ou yellow */
-jouer:-
-	joueur(L_joueur),
-	member(b,L_joueur),
-	couleur([Couleur,Couleur2|Tail]),
-	plateau(Plateau),
-	random_member(X, [Couleur,Couleur2|Tail]),
-	member(X,[pink,yellow]),
-	member([_,Colonne,_,X,b],Plateau),	
-	random_member(NLigne, [4,5,6]),
-	deplacer2(b,X,NLigne,Colonne,NPlateau,NCouleur),
+	accessible(b,X,Plateau,L_accessible),
+	jouable(b,L_accessible,X,L_jouable),
+	my_sort(L_jouable,L_sort),
+	choix(L_sort,L_sort,X,Case),
+	Case = [NLigne,NColonne,NCouleur],
+	deplacer2(b,X,NLigne,NColonne,NPlateau,NCouleur),
 	retract(joueur(_)),
 	assert(joueur([a])),
 	retract(couleur([Couleur,Couleur2|Tail])),

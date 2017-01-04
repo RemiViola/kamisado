@@ -41,9 +41,9 @@ tester(Ligne):-
 	Ligne \= 1,!.
 
 tester(Ligne):-
-	Ligne is 1,
+	Ligne is 1,/*
 	retract(joueur(_)),
-	retract(couleur(_)),
+	retract(couleur(_)),*/
 	send(@p, display,new(Text, text('YOU WIN')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)).
 
