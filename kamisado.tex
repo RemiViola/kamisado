@@ -45,13 +45,12 @@ To make our project more alive, we created a graphical user interface with the l
 \end{center}
 To run our program in a terminal, you have to write :
 \begin{center}
-\verb?swipl k.pl ia_firstname.pl?
+\verb?swipl k.pl?
 \end{center}
-where firstname is one of our first name. 
-In Prolog, you have to call the predicate \verb?commencer.? if you want to start or the predicate \verb?ia_commencer.? if you want to let the artificial intelligence start.
+In Prolog, you have to call the predicate \verb?commencer(firstname).? if you want to start or the predicate \verb?ia_commencer(firstname).? if you want to let the artificial intelligence start where firstname is one of our first name. 
 During the game, to play, you have to click on one of your towers and checkboxes will pop up. You have to select the color of the tower (only for the first round if you start), the direction  between left, forward and right, and the number of square of your move.
 You have a printing of the current player and the current color and, if it's the end of the round, a printing for the winning or the loss of the round.\\
-You can replay with the predicates \verb?recommencer.? and \verb?ia_recommencer.?
+You can replay with the predicates \verb?recommencer(firstname).? and \verb?ia_recommencer(firstname).?
 This interface is basic but sufficient for seeing what you do.
 
 \section{Heuristics}
