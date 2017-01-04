@@ -1,8 +1,3 @@
-/*	Chercher un moyen d'évaluer le coup optimum pour l'IA...
-	peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
-	Choisir dans ce cas le meilleur ratio ?
-*/
-
 :- use_module(library(random)).
 
 /*Gestion du premier coup de l'ia si elle commence*/
@@ -38,6 +33,8 @@ jouer:-
 	retract(plateau(Plateau)),
 	assert(plateau(NPlateau)),
 	redessiner,
+	retract(joueur(_)),
+	retract(couleur(_)),
 	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
 	send(Text, font, font(times, bold, 40)),!.
 
@@ -414,25 +411,3 @@ my_merge([H1,H3|T1],[H2,H4|T2],L):-
 	Colonne4 < Colonne2,
 	Colonne2 < Colonne1,
 	append([H2,H4,H1],L_intermediaire,L),!.
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

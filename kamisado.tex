@@ -43,6 +43,7 @@ To run our program in a terminal, you have to write : \verb?swipl k.pl ia_firstn
 In Prolog, you have to call the predicate \verb?commencer.? if you want to start or the predicate \verb?ia_commencer.? if you want to let the artificial intelligence to start.\\
 During the game, to play, you have to click on one of your towers and checkboxes will pop up. You have to select the color of the tower (only for the first round if you start), the direction  between left, forward and right, and the number of square of your move.\\
 You have a printing of the current player and the current color and, if it's the end of the round, a printing for the winning or the loss of the round.\\
+You can replay with the predicates \verb?recommencer.? and \verb?ia_recommencer.?
 This interface is basic but sufficient for seeing what you do.
 
 \section{Heuristics}
@@ -51,6 +52,8 @@ This heuristic is the simplest. The artificial intelligence selects all the squa
 If there is no possible square with this constraint, it selects the first square which force the player to free a square which allows to win at the following blow by the active tower.\\
 If there is no square which satisfy this new constraint, it selects the first square in the list.\\
 In the case there would be no playable square without risks, it knows that it will lose and it also chooses the first one of the list.
+
+To test this strategy, you can try this fatal first blow : brown-forward-6. The artificial intelligence move to the brown square of the second line but you can't play your brown tower. So, you pass and it have to play its red tower which wins.
 
 \subsection{valentin}
 

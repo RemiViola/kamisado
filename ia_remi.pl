@@ -1,8 +1,3 @@
-/*	Chercher un moyen d'évaluer le coup optimum pour l'IA...
-	peut être simuler toutes les parties possibles et remonter le nombre de victoires et de défaites correspondantes.
-	Choisir dans ce cas le meilleur ratio ?
-*/
-
 :- use_module(library(random)).
 
 /*Gestion du premier coup de l'ia si elle commence*/
