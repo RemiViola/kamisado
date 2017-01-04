@@ -31,9 +31,9 @@ This report will present you the game Kamisado as well as various artificial int
 \newpage
 
 \section{Presentation of the game}
-\verb?Kamisado? \footnote{\url{http://www.burleygames.com/board-games/kamisado-original/}} is an abstract two-player game where, to win a round, you have to move, on a 8$\times$8 colored board, one of your 8 colored towers from an edge to the other one. The rules are simple : In your turn, you can move your tower of the active color, in a straight line, of the number of square which you want. The active color is the color of the square of arrival of the previous action of your opponent.\\
-The party can be played in one, three, seven or fifteen rounds.\\
-To simplify the project, we decided to code only one round.
+\verb?Kamisado? \footnote{\url{http://www.burleygames.com/board-games/kamisado-original/}} is an abstract two-player game where, to win a round, you have to move, on a 8$\times$8 colored board, one of your 8 colored towers from an edge to the other one. The rules are simple.\\
+In your turn, you can move your tower of the active color, in a straight line, of the number of square which you want. The active color is the color of the square of arrival of the previous action of your opponent.\\
+The party can be played in one, three, seven or fifteen rounds. To simplify the project, we decided to code only one round.
 \begin{center}
 \includegraphics[scale = 0.09]{kamisado.jpeg}
 \end{center}
@@ -48,7 +48,7 @@ To run our program in a terminal, you have to write :
 \verb?swipl k.pl ia_firstname.pl?
 \end{center}
 where firstname is one of our first name. 
-In Prolog, you have to call the predicate \verb?commencer.? if you want to start or the predicate \verb?ia_commencer.? if you want to let the artificial intelligence to start.
+In Prolog, you have to call the predicate \verb?commencer.? if you want to start or the predicate \verb?ia_commencer.? if you want to let the artificial intelligence start.
 During the game, to play, you have to click on one of your towers and checkboxes will pop up. You have to select the color of the tower (only for the first round if you start), the direction  between left, forward and right, and the number of square of your move.
 You have a printing of the current player and the current color and, if it's the end of the round, a printing for the winning or the loss of the round.\\
 You can replay with the predicates \verb?recommencer.? and \verb?ia_recommencer.?
@@ -57,7 +57,7 @@ This interface is basic but sufficient for seeing what you do.
 \section{Heuristics}
 \subsection{remi}
 This heuristic is the simplest. The artificial intelligence selects all the squares where it can move without risks to lose. In this list, it selects the first square which allows to win at the following blow by the active tower.\\
-If there is no possible square with this constraint, it selects the first square which force the player to free a square which allows to win at the following blow by the active tower.\\
+If there is no possible square with this constraint, it selects the first square which forces the player to free a square which allows to win at the following blow by the active tower.\\
 If there is no square which satisfy this new constraint, it selects the first square in the list.\\
 In the case there would be no playable square without risks, it knows that it will lose and it also chooses the first one of the list.\\ \\
 To test this strategy, you have several possibilities. If the artificial intelligence starts, it chooses the first color randomly but you can see that, for each color, it move on the nearest square where it can force the user to move.
@@ -70,7 +70,7 @@ For more interesting tests when you start, you can try :
 \begin{verbatim}
 red-forward-4 + blue-forward-3 + orange-left-5 + pink-forward-5 + red-left-1...
 \end{verbatim}
-After the first move, the artificial intelligence forces you to move your blue tower because it can't have an attack position. After the second, it move to a position where it will attack directly with his active tower when you will let it play this tower.
+After the first move, the artificial intelligence forces you to move your blue tower because it can't have an attack position. After the second, it move to a position where it will attack directly with its active tower when you will let it play this tower.
 After the third, it moves its orange tower to the pink square because it's the nearest postition where it can force you to free a square to attack. It doesn't choose the blue square because it would let you win. After each other blow, the artificial intelligence move to have an attack position. 
 In this situation, you just have the yellow square free for your brown tower... But you can win with the following sequence : 
 \begin{verbatim}
