@@ -493,6 +493,8 @@ et remise en place du plateau et des variables*/
 recommencer(IA):-
 	couleur(_),
 	retract(ia(_)),
+	retract(n_round(_)),
+	assert(n_round(1)),
 	free(@p),
 	free(@t1),
 	free(@t2),
@@ -516,6 +518,8 @@ recommencer(IA):-
 recommencer(IA):-
 	not(couleur(_)),
 	retract(ia(_)),
+	retract(n_round(_)),
+	assert(n_round(1)),
 	free(@p),
 	free(@t1),
 	free(@t2),
