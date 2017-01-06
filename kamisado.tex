@@ -32,7 +32,7 @@ This report will present you the game Kamisado as well as various artificial int
 
 \section{Presentation of the game}
 \verb?Kamisado? \footnote{\url{http://www.burleygames.com/board-games/kamisado-original/}} is an abstract two-player game where, to win a round, you have to move, on a 8$\times$8 colored board, one of your 8 colored towers from an edge to the other one. The rules are simple.\\
-In your turn, you can move your tower of the active color, in a straight line, of the number of square which you want. The active color is the color of the square where your opponent arrived during the previous blow.\\
+In your turn, you can move your tower of the active color, in a straight line, of the number of square which you want. The active color is the color of the square where your opponent arrived during the previous move.\\
 The party can be played in one, three, seven or fifteen rounds. To simplify the project, we decided to code only one round.
 \begin{center}
 \includegraphics[scale = 0.09]{kamisado.jpeg}
@@ -55,12 +55,12 @@ This interface is basic but sufficient for seeing what you do.
 
 \section{Heuristics}
 \subsection{remi}
-This heuristic is the simplest. The artificial intelligence selects all the squares where it can move without risks to lose. In this list, it selects the first square which allows to win at the following blow by the active tower.\\
-If there is no possible square with this constraint, it selects the first square which forces the player to free a square which allows to win at the following blow by the active tower.\\
+This heuristic is the simplest. The artificial intelligence selects all the squares where it can move without risks to lose. In this list, it selects the first square which allows to win at the following move by the active tower.\\
+If there is no possible square with this constraint, it selects the first square which forces the player to free a square which allows to win at the following move by the active tower.\\
 If there is no square which satisfy this new constraint, it selects the first square in the list.\\
 In the case there would be no playable square without risks, it knows that it will lose and it also chooses the first one of the list.\\ \\
 To test this strategy, you have several possibilities. If the artificial intelligence starts, it chooses the first color randomly but you can see that, for each color, it move on the nearest square where it can force the user to move.
-If you start, you can try this fatal first blow : 
+If you start, you can try this fatal first move : 
 \begin{verbatim}
 brown-forward-6 !
 \end{verbatim}
@@ -70,7 +70,7 @@ For more interesting tests when you start, you can try :
 red-forward-4 + blue-forward-3 + orange-left-5 + pink-forward-5 + red-left-1...
 \end{verbatim}
 After the first move, the artificial intelligence forces you to move your blue tower because it can't have an attack position. After the second, it move to a position where it will attack directly with its active tower when you will let it play this tower.
-After the third, it moves its orange tower to the pink square because it's the nearest postition where it can force you to free a square to attack. It doesn't choose the blue square because it would let you win. After each other blow, the artificial intelligence move to have an attack position. 
+After the third, it moves its orange tower to the pink square because it's the nearest postition where it can force you to free a square to attack. It doesn't choose the blue square because it would let you win. After each other move, the artificial intelligence move to have an attack position. 
 In this situation, you just have the yellow square free for your brown tower... But you can win with the following sequence : 
 \begin{verbatim}
 ...brown-forward-3 + yellow-right-2 + pink-forward-2
@@ -82,5 +82,9 @@ The first move is compulsory. The second asks to the artificial intelligence to 
 
 \subsection{mathieu}
 
+
+\subsection{mathieu2}
+Contrary to the previous version, we do not count any more the accessible squares but the number of towers which can win at the next move. 
+With this heuristics, the first moves are the same but as soon as it is possible, the artificial intelligence tries finally to increase the number of empty compartments on the last line.
 
 \end{document}
