@@ -1,10 +1,6 @@
-:-module(ia_mathieu,[jouer_mat/0,n_round/1]).
+:-module(ia_mathieu,[jouer_mat/0]).
 
 :- use_module(library(random)).
-
-:-dynamic(n_round/1).
-
-n_round(1).
 
 % if the computer begins the play
 % we choose randomly the color of the first move

@@ -1,15 +1,11 @@
-:-module(ia_mathieu,[jouer_mat/0]).
+:-module(ia_mathieu2,[jouer_mat2/0]).
 
 :- use_module(library(random)).
-
-:-dynamic(n_round/1).
-
-n_round(1).
 
 % if the computer begins the play
 % we choose randomly the color of the first move
 % Compute the best move for computer with minimax
-jouer_mat:-
+jouer_mat2:-
     joueur(L_joueur),
     member(b,L_joueur),
     couleur([Color,Color2|Tail]),
@@ -32,7 +28,7 @@ jouer_mat:-
     fin(State),!.
 
 % Compute the best move for computer with minimax
-jouer_mat:-
+jouer_mat2:-
     joueur(L_joueur),
     member(b,L_joueur),
     couleur([Color]),
@@ -172,25 +168,25 @@ eval(_,[],_,0).
 eval(a,[H|T],Plateau,Eval_t1):-
 	accessible(a, H, Plateau, L_accessible),
 	findall(X ,member([1,X,_], L_accessible), L_eval),
-	length(L_eval, Eval_t2)==0,
+	length(L_eval,_)==0,
 	eval(a,T,Plateau,Eval_t1).
 
 eval(a,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible),
 	findall(X ,member([1,X,_], L_accessible), L_eval),
-	length(L_eval, Eval_t2)\==0,
+	length(L_eval,_)\==0,
 	eval(a,T,Plateau,Eval_t1),
 	Eval is Eval_t1 + 1.
 
 eval(b,[H|T],Plateau,Eval_t1):-
 	accessible(b, H, Plateau, L_accessible),
 	findall(X ,member([8,X,_], L_accessible), L_eval),
-	length(L_eval, NEval)==0,
+	length(L_eval,_)==0,
 	eval(b,T,Plateau,Eval_t1).
 
 eval(b,[H|T],Plateau,Eval):-
 	accessible(b, H, Plateau, L_accessible),
 	findall(X ,member([8,X,_], L_accessible), L_eval),
-	length(L_eval, NEval)\==0,
+	length(L_eval,_)\==0,
 	eval(b,T,Plateau,Eval_t1),
 	Eval is Eval_t1 - 1.
