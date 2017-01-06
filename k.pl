@@ -1,4 +1,4 @@
-/*	une case vide est représentée par une liste [ligne,colonne,couleur]
+/*	Une case vide est représentée par une liste [ligne,colonne,couleur]
 	une case occupée est représentée par une liste [ligne,colonne,couleur,tour,joueur]
 	les joueurs sont a et b
 	les couleurs sont orange(orange), bleu(blue), violet(purple), rose(pink), jaune(yellow), rouge(red), vert(green) et marron(brown)
@@ -11,6 +11,7 @@
 /*Chargement des différentes ia*/
 :-use_module(ia_remi).
 :-use_module(ia_mathieu).
+:-use_module(ia_valentin).
 
 
 /*La gestion de l'IA*/
