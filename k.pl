@@ -11,6 +11,8 @@
 /*Chargement des différentes ia*/
 :-use_module(ia_remi).
 :-use_module(ia_mathieu).
+:-use_module(ia_mathieu2).
+:-use_module(ia_mathieu3).
 :-use_module(ia_valentin).
 
 
@@ -483,6 +485,14 @@ jouer:-
 
 jouer:-
 	ia(mathieu),
+	jouer_mat,!.
+
+jouer:-
+	ia(mathieu2),
+	jouer_mat,!.
+
+jouer:-
+	ia(mathieu3),
 	jouer_mat,!.
 
 jouer:-

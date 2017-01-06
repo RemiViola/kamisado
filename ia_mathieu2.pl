@@ -1,105 +1,105 @@
 :-module(ia_mathieu,[jouer_mat/0]).
 
 :- use_module(library(random)).
-:-dynamic(n_tour/1).
 
-n_tour(1).
+:-dynamic(n_round/1).
 
+n_round(1).
+
+% if the computer begins the play
+% we choose randomly the color of the first move
+% Compute the best move for computer with minimax
 jouer_mat:-
-	joueur(L_joueur),
-	member(b,L_joueur),
-	couleur([Couleur,Couleur2|Tail]),
-	plateau(Plateau),
-	random_member(X, [Couleur,Couleur2|Tail]),
-	retract(n_tour(_)),
-	assert(n_tour(1)),
-	bestMove([b, X, play, Plateau], [_NextPlayer, NCouleur, State, NPlateau]),
-	n_tour(NT),
-	NT2 is NT+1,
-	retract(n_tour(_)),
-	assert(n_tour(NT2)),
-	retract(joueur(_)),
-	assert(joueur([a])),
-	retract(couleur([Couleur,Couleur2|Tail])),
-	assert(couleur([NCouleur])),
-	retract(plateau(Plateau)),
-	assert(plateau(NPlateau)),
-	redessiner,
-	fin(State),!.
+    joueur(L_joueur),
+    member(b,L_joueur),
+    couleur([Color,Color2|Tail]),
+    plateau(Board),
+    random_member(X, [Color,Color2|Tail]),
+    retract(n_round(_)),
+    assert(n_round(1)),
+    bestMove([b, X, play, Board], [_NextPlayer, NColor, State, NextBoard]),
+    n_round(NR),
+    NR2 is NR+1,
+    retract(n_round(_)),
+    assert(n_round(NR2)),
+    retract(joueur(_)),
+    assert(joueur([a])),
+    retract(couleur([Color,Color2|Tail])),
+    assert(couleur([NColor])),
+    retract(plateau(Board)),
+    assert(plateau(NextBoard)),
+    redessiner,
+    fin(State),!.
 
+% Compute the best move for computer with minimax
 jouer_mat:-
-	joueur(L_joueur),
-	member(b,L_joueur),
-	couleur([Couleur]),
-	plateau(Plateau),
-	write(Couleur),nl,
-	bestMove([b, Couleur, play, Plateau], [_NextPlayer, NCouleur, State, NPlateau]),
-	n_tour(NT),
-	NT2 is NT+1,
-	retract(n_tour(_)),
-	assert(n_tour(NT2)),
-	retract(joueur(_)),
-	assert(joueur([a])),
-	retract(couleur([Couleur])),
-	assert(couleur([NCouleur])),
-	retract(plateau(Plateau)),
-	assert(plateau(NPlateau)),
-	redessiner,
-	fin(State),!.
+    joueur(L_joueur),
+    member(b,L_joueur),
+    couleur([Color]),
+    plateau(Board),
+    bestMove([b, Color, play, Board], [_NextPlayer, NColor, State, NextBoard]),
+    n_round(NR),
+    NR2 is NR+1,
+    retract(n_round(_)),
+    assert(n_round(NR2)),
+    retract(joueur(_)),
+    assert(joueur([a])),
+    retract(couleur([Color])),
+    assert(couleur([NColor])),
+    retract(plateau(Board)),
+    assert(plateau(NextBoard)),
+    redessiner,
+    fin(State),!.
+
 
 fin(State):-
-	State \= win,!.
+    State \= win,!.
 
+% If Computer win
 fin(State):-
-	State = win,
-	retract(joueur(_)),
-	retract(couleur(_)),
-	send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
-	send(Text, font, font(times, bold, 40)).
+    State = win,
+    retract(joueur(_)),
+    retract(couleur(_)),
+    send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
+    send(Text, font, font(times, bold, 40)).
 
-
+% bestMove(+Pos, -NextPos)
+% Compute the best Next Position from Position Pos
+% with minimax algorithm.
 bestMove(Pos, NextPos) :-
     minimax(Pos, NextPos, _, 0).
 
+% winPos(+Player, +Board)
+% True if Player win in Board.
+winPos(b, _C, Board):-
+    member([8,_,_,_,b],Board).
 
-winPos(b, Couleur, Plateau):-
-	%accessible(b, Couleur, Plateau, L_accessible),
-	member([8,_,_,_,b],Plateau).
+winPos(a, _C, Board):-
+    member([1,_,_,_,a],Board).
 
-winPos(a, Couleur, Plateau):-
-	%accessible(a, Couleur, Plateau, L_accessible),
-	member([1,_,_,_,a],Plateau).
-
+% nextPlayer(X1, X2)
+% True if X2 is the next player to play after X1.
 nextPlayer(a, b).
 nextPlayer(b, a).
-
 
 % minimax(Pos, BestNextPos, Val)
 % Pos is a position, Val is its minimax value.
 % Best move from Pos leads to position BestNextPos.
 minimax(Pos, BestNextPos, Val, Iteration) :-                     % Pos has successors
-	%write(Pos),nl,
-	Iteration2 is Iteration +1, 
+    Iteration2 is Iteration +1, 
     bagof(NextPos, move(Pos, NextPos, Iteration2), NextPosList),
-	%write(Iteation2),nl,
     best(NextPosList, BestNextPos, Val, Iteration2), !.
 
 minimax(Pos, _, Val, _) :-                     % Pos has no successors
     utility(Pos, Val).
-	%write(Val),nl.
-
 
 best([Pos], Pos, Val, Iteration) :-
     minimax(Pos, _, Val, Iteration).
-	%write('test1'),nl, !.
 
 best([Pos1 | PosList], BestPos, BestVal, Iteration) :-
     minimax(Pos1, _, Val1, Iteration),
-	%write(Val1),nl,
     best(PosList, Pos2, Val2, Iteration),
     betterOf(Pos1, Val1, Pos2, Val2, BestPos, BestVal).
-
-
 
 betterOf(Pos0, Val0, _, Val1, Pos0, Val0) :-   % Pos0 better than Pos1
     min_to_move(Pos0),                         % MIN to move in Pos0
@@ -112,36 +112,34 @@ betterOf(_, _, Pos1, Val1, Pos1, Val1).        % Otherwise Pos1 better than Pos0
 
 % move(+Pos, -NextPos)
 % True if there is a legal (according to rules) move from Pos to NextPos.
-move([X1, T1, play, Board], [X2, T2, win, NextBoard], _) :-
+% The NextPos with cut allows to reduce the computation time by limiting the recursion to number of round + 3
+move([X1, C1, play, Board], [X2, C2, win, NextBoard], _) :-
     nextPlayer(X1, X2),
-    move_aux(X1, T1, Board, T2, NextBoard),
-    winPos(X1, T1, NextBoard), !.
+    move_aux(X1, C1, Board, C2, NextBoard),
+    winPos(X1, C1, NextBoard), !.
 
-move([X1, T1, play, Board], [X2, T2, cut, NextBoard], NT2) :-
-	n_tour(NT),
-	NT2 is NT + 3,
+move([X1, C1, play, Board], [X2, C2, cut, NextBoard], NR2) :-
+    n_round(NR),
+    NR2 is NR + 3,
     nextPlayer(X1, X2),
-    move_aux(X1, T1, Board, T2, NextBoard), !.
+    move_aux(X1, C1, Board, C2, NextBoard), !.
 
-move([X1, T1, play, Board], [X2, T2, play, NextBoard], _) :-
+move([X1, C1, play, Board], [X2, C2, play, NextBoard], _) :-
     nextPlayer(X1, X2), 
-    move_aux(X1, T1, Board, T2, NextBoard).
-	%write(T2),nl.
+    move_aux(X1, C1, Board, C2, NextBoard).
 
-% move_aux(+Player, +Board, -NextBoard)
-% True if NextBoard is Board whith an empty case replaced by Player mark.
-move_aux(X1, T1, Plateau, T2, Plateau):-
-	member([_,_, T2, T1, X1], Plateau),
-	accessible(X1, T1, Plateau, L_accessible),
-	L_accessible = [].
-	%write(T2),nl.
+% move_aux(+Player, +ColorPlayer, +Board, -ColorNextPlayer, -NextBoard)
+% True if NextBoard is Board with an empty case in the available list replaced by Player mark.
+move_aux(X1, C1, Board, C2, Board):-
+    member([_,_, C2, C1, X1], Board),
+    accessible(X1, C1, Board, L_available),
+    L_available = [].
 
-
-move_aux(X1, T1, Plateau, T2, NPlateau):-
-	member([Ligne, Colonne, _C, T1, X1], Plateau),
-	accessible(X1, T1, Plateau, L_accessible),
-	member([NLigne,NColonne,T2],L_accessible),
-	modifier_plateau(Plateau, Ligne, Colonne, NLigne, NColonne, T1, X1, NPlateau).
+move_aux(X1, C1, Board, C2, NextBoard):-
+    member([Ligne, Colonne, _C, C1, X1], Board),
+    accessible(X1, C1, Board, L_available),
+    member([NLigne,NColonne,C2],L_available),
+    modifier_plateau(Board, Ligne, Colonne, NLigne, NColonne, C1, X1, NextBoard).
 
 
 % min_to_move(+Pos)
@@ -154,20 +152,19 @@ max_to_move([b, _, _, _]).
 
 % utility(+Pos, -Val) :-
 % True if Val the the result of the evaluation function at Pos.
-% We will only evaluate for final position.
-% So we will only have MAX win, MIN win or draw.
-% We will use  1 when MAX win
-%             -1 when MIN win
-%              0 otherwise.
+% We will evaluate for final position and cut position.
+% We will use  100 when MAX win
+%             -100 when MIN win
+% and the number of winning position in the available list for every tower of the previous player when MIN cut
+% its negation when MAX cut
 utility([b, _, win, _], -100).       % Previous player (MAX) has win.
 utility([a, _, win, _], 100).      % Previous player (MIN) has win.
-utility([a, _, cut, Plateau], Eval):-
-	eval(a, [brown,green,red,yellow,pink,purple,blue,orange],Plateau,Eval).
-	%write(Eval),nl.
 
-utility([b, _, cut, Plateau], Eval):-
-	eval(b, [brown,green,red,yellow,pink,purple,blue,orange],Plateau,Eval).
-	%write(Eval),nl.
+utility([a, _, cut, Board], Eval):-
+    eval(a, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).
+
+utility([b, _, cut, Board], Eval):-
+    eval(b, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).
 
 
 eval(_,[],_,0).	
