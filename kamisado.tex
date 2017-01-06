@@ -84,7 +84,13 @@ The first move is compulsory. The second asks to the artificial intelligence to 
 
 
 \subsection{mathieu2}
-Contrary to the previous version, we do not count any more the accessible squares but the number of towers which can win at the next move. 
-With this heuristics, the first moves are the same but as soon as it is possible, the artificial intelligence tries finally to increase the number of empty compartments on the last line.
+Contrary to the previous version, we do not count any more the accessible final squares but the number of towers which can win at their next move. 
+With this heuristics, the first moves are the same but as soon as possible, the artificial intelligence tries finally to increase the number of empty squares on the last line.
+
+\subsection{mathieu3}
+In this version, we decided to take into account also the number of accessible final squares of the opponent as a penalty in our evaluation.
+
+\subsection{mathieu4}
+In this final version, we decided to increase the evaluation by 20 times the difference between the number of accessible squares for the player and for the artificial intelligence. We also increase this evaluation by the difference between the number of accessible final squares by each of them.
 
 \end{document}
