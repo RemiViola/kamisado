@@ -13,6 +13,7 @@
 :-use_module(ia_mathieu).
 :-use_module(ia_mathieu2).
 :-use_module(ia_mathieu3).
+:-use_module(ia_mathieu4).
 :-use_module(ia_valentin).
 
 /*La gestion du nombre de récursion pour les ia_math*/
@@ -498,6 +499,10 @@ jouer:-
 jouer:-
 	ia(mathieu3),
 	jouer_mat3,!.
+
+jouer:-
+	ia(mathieu4),
+	jouer_mat4,!.
 
 jouer:-
 	ia(valentin),

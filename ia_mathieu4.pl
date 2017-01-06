@@ -1,11 +1,11 @@
-:-module(ia_mathieu3,[jouer_mat3/0]).
+:-module(ia_mathieu4,[jouer_mat4/0]).
 
 :- use_module(library(random)).
 
 % if the computer begins the play
 % we choose randomly the color of the first move
 % Compute the best move for computer with minimax
-jouer_mat3:-
+jouer_mat4:-
     joueur(L_joueur),
     member(b,L_joueur),
     couleur([Color,Color2|Tail]),
@@ -28,7 +28,7 @@ jouer_mat3:-
     fin(State),!.
 
 % Compute the best move for computer with minimax
-jouer_mat3:-
+jouer_mat4:-
     joueur(L_joueur),
     member(b,L_joueur),
     couleur([Color]),
@@ -163,7 +163,7 @@ utility([b, _, cut, Board], Eval):-
     eval(b, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).
 
 
-eval(_,[],_,0).	
+eval(_,[],_,0).
 
 eval(a,[H|T],Plateau,Eval_t1):-
 	accessible(a, H, Plateau, L_accessible_a),
@@ -176,7 +176,7 @@ eval(a,[H|T],Plateau,Eval_t1):-
 	Eval_b==0,
 	eval(a,T,Plateau,Eval_t1).
 
-eval(a,[H|T],Plateau,Eval_t1):-
+eval(a,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
 	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
 	length(L_eval_a,Eval_a),
@@ -185,7 +185,9 @@ eval(a,[H|T],Plateau,Eval_t1):-
 	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
 	length(L_eval_b,Eval_b),
 	Eval_b\==0,
-	eval(a,T,Plateau,Eval_t1).
+	eval(a,T,Plateau,Eval_t1),
+	Eval_ is Eval_t1 + Eval_a,
+	Eval is Eval_ - Eval_b.
 
 eval(a,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
@@ -197,7 +199,8 @@ eval(a,[H|T],Plateau,Eval):-
 	length(L_eval_b,Eval_b),
 	Eval_b==0,
 	eval(a,T,Plateau,Eval_t1),
-	Eval is Eval_t1 + 1.
+	Eval_ is Eval_t1 + 20,
+	Eval is Eval_ + Eval_a.
 
 eval(a,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
@@ -209,7 +212,8 @@ eval(a,[H|T],Plateau,Eval):-
 	length(L_eval_b,Eval_b),
 	Eval_b\==0,
 	eval(a,T,Plateau,Eval_t1),
-	Eval is Eval_t1 - 1.
+	Eval_ is Eval_t1 - 20,
+	Eval is Eval_ - Eval_b.
 
 eval(b,[H|T],Plateau,Eval_t1):-
 	accessible(a, H, Plateau, L_accessible_a),
@@ -222,7 +226,7 @@ eval(b,[H|T],Plateau,Eval_t1):-
 	Eval_b==0,
 	eval(b,T,Plateau,Eval_t1).
 
-eval(b,[H|T],Plateau,Eval_t1):-
+eval(b,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
 	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
 	length(L_eval_a,Eval_a),
@@ -231,7 +235,9 @@ eval(b,[H|T],Plateau,Eval_t1):-
 	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
 	length(L_eval_b,Eval_b),
 	Eval_b\==0,
-	eval(b,T,Plateau,Eval_t1).
+	eval(b,T,Plateau,Eval_t1),
+	Eval_ is Eval_t1 - Eval_a,
+	Eval is Eval_ + Eval_b.
 
 eval(b,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
@@ -243,7 +249,8 @@ eval(b,[H|T],Plateau,Eval):-
 	length(L_eval_b,Eval_b),
 	Eval_b==0,
 	eval(b,T,Plateau,Eval_t1),
-	Eval is Eval_t1 - 1.
+	Eval_ is Eval_t1 - 20,
+	Eval is Eval_ - Eval_a.
 
 eval(b,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
@@ -255,4 +262,5 @@ eval(b,[H|T],Plateau,Eval):-
 	length(L_eval_b,Eval_b),
 	Eval_b\==0,
 	eval(b,T,Plateau,Eval_t1),
-	Eval is Eval_t1 + 1.
+	Eval_ is Eval_t1 + 20,
+	Eval is Eval_ + Eval_b.
