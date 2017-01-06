@@ -1,4 +1,4 @@
-:-module(ia_mathieu,[jouer_mat/0]).
+:-module(ia_mathieu,[jouer_mat/0,n_round/1]).
 
 :- use_module(library(random)).
 
