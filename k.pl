@@ -458,9 +458,9 @@ gestion(Conteneur):-
 	length(L_accessible,X),
 	X > 0,
 	new(Dialog, dialog(string('Move of the %s tower of the %s player', Conteneur?fill_pattern,Conteneur?colour))),
-	send(Dialog, append, new(MCouleur, menu(couleur))),
+	send(Dialog, append, new(MCouleur, menu(color))),
 	send(Dialog, append, new(Direction, menu(direction))),
-	send(Dialog, append, new(Nb_case, menu(valeur))),
+	send(Dialog, append, new(Nb_case, menu(value))),
 	send(MCouleur, layout, vertical),/*
 	S = string('%s',Conteneur?fill_pattern),write(S),nl,
 	atom_string(C,S),
