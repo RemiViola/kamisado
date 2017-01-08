@@ -1,158 +1,202 @@
 :-module(ia_valentin,[jouer_val/0]).
-
-/*Premier coup ...*/
-/*jouer:-
-    couleur(L),
-    length(L,nb_elem),
-    nb_elem > 1.
-*/
-/*Liste coup sans interdit*/
-liste_coup([],[]).
-
-liste_coup([[_,_,X]|L],L_):-
-    liste_couleur_bloque(b,L_coul_bloq),
-    memberchk(X,L_coul_bloq),
-    liste_coup(L,L_2),
-    L_ = L_2.
-
-liste_coup([[A,O,X]|L],L_):-
-    liste_couleur_bloque(b,L_coul_bloq),
-    not(memberchk(X,L_coul_bloq)),
-    liste_coup(L,L_2),
-    L_ = [[A,O,X]|L_2].
+:- use_module(library(random)).
     
-
+/*** prédicat permetant de choisir le meilleur coup pour l'ia ***/
+/****   1: Couleur de la tour a jouer ****/
+/****   2: Plateau sûr le quel simuler le coup ****/
+/****   3: Liste de coup a simuler dont les élément sont de la forme : [Abscice de la futur case, Ordonné de la future case, Couleur de la future case] ****/
+/****   4: Liste de coup simuler dont les élément sont de la forme : [A,O,C,Score] ****/
+/****   5: Nombre de coup restant à simuler ****/
 meilleur_coup(_,_,[],[],_).
 
-/*le coup est gagnant*/
-meilleur_coup(_,_,[[1,O,NC]|_],L_,_):-
-    /*write('---etude de la position GG: '),
-    write(A), write(' '), write(O), nl,*/
- 
-    L_ = [[1,O,NC,9]]. /*on transmet ce coup*/
+/** le coup est gagnant : une case de la ligne adverse est accessible, on donne le score maximal**/
+meilleur_coup(_,_,[[8,_,_]|_],[[8,_,_,9]],_).
 
-/*le coup étudié est bon*/
+/** le coup doit être étudié **/
 meilleur_coup(C,P,[[A,O,NC]|L],L_,NB_COUP):-
-    write(NB_COUP),write(' '),
-    write('etude de la position GG: '),
-    write(A), write(' '), write(O), nl,
 
+    /* simulation du coup */
     member([AC,OC,_,C,b],P),
     modifier_plateau(P,AC,OC,A,O,C,b,NP),
     member([A,O,NC,C,b],NP),
 
+    /* simulation du coup adverse */
     coup_utilisateur(NC,NP,S,NB_COUP),
+
+    /* simulation des autres coups */
     meilleur_coup(C,P,L,L2,NB_COUP),
     
     L_ = [[A,O,NC,S]|L2]. /*on transmet ce coup*/
 
+
+/*** predicat intermediaire entre la prédiction du coup de l'ia et celui de l'utilisateur ***/
+/****    1: Couleur à jouer    ****/
+/****    2: Plateau sûr le quel simuler le coup   ****/
+/****    3: Score du coup    ****/
+/****    4: Nombre de coup restant à simuler   ****/
+
+/** le coup est perdant : la première ligne de l'ia est accessible, on donne le score minimal **/
 coup_utilisateur(C,P,-1,_):-
-    /*write(C),nl,*/
     accessible(a,C,P,L_accessible),
     member([1,_,_],L_accessible).
 
-coup_utilisateur(C,P,S,0):-
-    accessible(a,C,P,L_accessible),
-    length(L_accessible,0),
-    liste_couleur_bloquee(a,P,NLCB), /* NLCB = nouveau LCB, après déplacement virtuel*/
-    length(NLCB,S). /*NNCB = nouveau nombre de couleurs bloquées, après déplacement virtuel*/
+/** la profondeur souhaité à été atteinte : on calcule le score**/
+coup_utilisateur(_,P,S,0):-
+    liste_couleur_bloquee(a,P,LCB), /* LCB = Liste de couleurs bloquées */
+    length(LCB,S). /*S = Nombre de couleurs bloquées */
 
+/** l'utilisateur et l'ia sont bloqué : on essai d'éviter cette situation **/
+coup_utilisateur(C,P,-1,_):-
+    accessible(a,C,P,[]),
+    member([_,_,NC,C,a],P),
+
+    accessible(b,NC,P,[]).      
+    
+
+/** l'utilisateur est bloqué : on simule le prochain coup de l'ia **/
 coup_utilisateur(C,P,S,NB_COUP):-
-    accessible(a,C,P,L_accessible),
-    length(L_accessible,0),
+    accessible(a,C,P,[]),
+    member([_,_,NC,C,a],P),
 
     NB_COUP2 is NB_COUP - 1,
-    accessible(b,NC,NP,L_coup_possible),
-    meilleur_coup(NC,NP,L_coup_possible,L2,NB_COUP2),
+    
+    /* On simule les prochains coups de l'ia */
+    accessible(b,NC,P,L_coup_possible),
+    meilleur_coup(NC,P,L_coup_possible,L2,NB_COUP2),
 
+    /* On maximise */
     my_sort2(L2,[[_,_,_,S]|_]).
-    
 
+/** RAS : on simule les coups possible de l'utilisateur **/
 coup_utilisateur(C,P,S,NB_COUP):-
-    write(NB_COUP),write('cu1'),nl,
-    accessible(a,C,P,L_accessible),
-    my_sort(L_accessible,L_trie1),
-    reverse(L_trie1,L_trie),
+    /* L = tout les coup possible */
+    accessible(a,C,P,L),
 
-    write('------'),nl,
-    meilleur_coup_utilisateur(C,L_trie,L,P,NB_COUP),
-    write('------'),nl,
-    my_sort3(L,[[_,_,_,S]|_]).
-/*
-coup_utilisateur(C,P,N,NB_COUP):-
-    write(NB_COUP),write('cu2'),nl,
-    accessible(a,C,P,L_accessible),
-    my_sort(L_accessible,L_trie1),
-    reverse(L_trie1,L_trie),
+    /* simulation de tout les coups */
+    meilleur_coup_utilisateur(C,L,L2,P,NB_COUP),
 
-    liste_couleur_bloquee(a,P,LCB),
-    length(LCB,N),
-    not(meilleur_coup_utilisateur(C,L_trie,_,P,NB_COUP))
-    .*/
+    /* On minimise */
+    my_sort3(L2,[[_,_,_,S]|_]).
 
-    
+
+
+/*** Prédicat permetant de simuler les coups de l'utilisateur ***/
+/****   1: Couleur de la tour a jouer ****/
+/****   2: Liste de coup a simuler dont les élément sont de la forme : [Abscice de la futur case, Ordonné de la future case, Couleur de la future case] ****/
+/****   3: Liste de coup simuler dont les élément sont de la forme : [A,O,C,Score] ****/
+/****   4: Plateau sûr le quel simuler le coup ****/
+/****   5: Nombre de coup restant à simuler ****/
+
 meilleur_coup_utilisateur(_,[],[],_,_).
 
-/*le coup étudié est bon*/
+/** la profondeur souhaité à été atteinte : on calcule le score après avoir simulé le coup**/
 meilleur_coup_utilisateur(C,[[A,O,NC]|L],L_,P,0):-
-    write('etude de la position u : '),
-    write(A), write(' '), write(O), nl,
-    
+    /* On simule le coup */
     member([AC,OC,_,C,a],P),
-    nl,
     modifier_plateau(P,AC,OC,A,O,C,a,NP),
-    nl,
     member([A,O,NC,C,a],NP),
-    nl,
-    
-    liste_couleur_bloquee(a,NP,NLCB), /* NLCB = nouveau LCB, après déplacement virtuel*/
-    length(NLCB,S), /*NNCB = nouveau nombre de couleurs bloquées, après déplacement virtuel*/
-    nl,
+
+    /* On calcule le score */
+    liste_couleur_bloquee(a,NP,LCB),  /* LCB = Liste de couleurs bloquées */
+    length(LCB,S), /*S = Nombre de couleurs bloquées */
+
+    /* On simule les autres coups */
     meilleur_coup_utilisateur(C,L,L_2,P,0),
-    L_ = [[A,O,NC,S]|L_2],!. /*on transmet ce coup*/
+    L_ = [[A,O,NC,S]|L_2],!.
 
-/*il faut approfondir*/
+/** l'utilisateur et l'ia sont bloqué, on essai d'éviter cette situation : Score = -1**/
 meilleur_coup_utilisateur(C,[[A,O,NC]|L],L_,P,NB_COUP):-
-    write(NB_COUP),write(' '),
-    write('etude de la position u : '),
-    write(A), write(' '), write(O), write(' '), nl,
-
-    NB_COUP > 0,
+    /* On simule le coup */
     member([AC,OC,_,C,a],P),
     modifier_plateau(P,AC,OC,A,O,C,a,NP),
     member([A,O,NC,C,a],NP),
 
-    NB_COUP2 is NB_COUP - 1,
-    accessible(b,NC,NP,L_coup_possible),
-    length(L_coup_possible,0),
-    meilleur_coup_utilisateur(NC,L_coup_possible,L2,NP,NB_COUP2),
+    /* l'ia ne peut pas jouer */
+    accessible(b,NC,NP,[]),
 
-    my_sort2(L2,[[_,_,_,S]|_]),
+    /* l'utilisateur ne peut pas jouer */
+    accessible(a,NC,NP,[]),
 
+    /* on simule les autres coup */
     meilleur_coup_utilisateur(C,L,L_2,P,NB_COUP),
-    L_ = [[A,O,NC,S]|L_2]. /*on transmet ce coup*/
+    L_ = [[A,O,NC,-1]|L_2].
 
+/* l'ia ne peut pas jouer : on re fait jouer l'utilisateur*/
+meilleur_coup_utilisateur(C,[[A,O,NC]|L],L_,P,NB_COUP):-
+    /* on simule le coup */
+    member([AC,OC,_,C,a],P),
+    modifier_plateau(P,AC,OC,A,O,C,a,NP),
+    member([A,O,NC,C,a],NP),
+    
+    /* l'ia ne peut pas jouer */
+    accessible(b,NC,NP,[]),
+
+    NB_COUP2 is NB_COUP - 1,
+
+    /* L_coup_possible = tout les coup possible pour l'utilisateur*/
+    accessible(a,NC,NP,L_coup_possible),
+
+    /* on simule tout les coups possibles */ 
+    meilleur_coup_utilisateur(C,L_coup_possible,L2,NP,NB_COUP2),
+
+    /* on minimise */
+    my_sort3(L2,[[_,_,_,S]|_]),
+    
+    /* on simule les autres coups */
+    meilleur_coup_utilisateur(C,L,L_2,P,NB_COUP),
+    L_ = [[A,O,NC,S]|L_2].
 
 /*il faut approfondir*/
 meilleur_coup_utilisateur(C,[[A,O,NC]|L],L_,P,NB_COUP):-
-    write(NB_COUP),write(' '),
-    write('etude de la position u : '),
-    write(A), write(' '), write(O), write(' '), nl,
-
-    NB_COUP > 0,
+    /* on simule le coup */
     member([AC,OC,_,C,a],P),
     modifier_plateau(P,AC,OC,A,O,C,a,NP),
     member([A,O,NC,C,a],NP),
 
     NB_COUP2 is NB_COUP - 1,
+    
+    /* L_coup_possible = tout les coup possible pour l'utilisateur*/
     accessible(b,NC,NP,L_coup_possible),
+    /* on simule tout les coups possibles */
     meilleur_coup(NC,NP,L_coup_possible,L2,NB_COUP2),
 
+    /* on maximise */
     my_sort2(L2,[[_,_,_,S]|_]),
 
+    /* on simule les autres coups */
     meilleur_coup_utilisateur(C,L,L_2,P,NB_COUP),
     L_ = [[A,O,NC,S]|L_2]. /*on transmet ce coup*/
 
+
+/**** Prédicat permetant de faire jouer l'ia ****/
+
+/** L'ia commence : on choisit un coup aux hasards **/
+jouer_val:-
+    joueur(LJ),
+    member(b,LJ),
+    couleur(L),
+    length(L,Nb_elem),
+    Nb_elem > 1,
+    /* plusieurs couleurs sont jouables -> c'est le premier coup */
+
+    /* choix de la tour aux hasards */
+    random_member(C,L),
+    plateau(P),
+
+    /* choix du déplacement aux hasards */
+    accessible(b,C,P,L_accessible),
+    random_member([A,O,NC],L_accessible),
+
+    /* routine de déplacement le la tour */
+    deplacer2(b,C,A,O,NP,NC),nl,!,
+    retract(joueur(_)),
+    assert(joueur([a])),
+    retract(couleur(_)),
+    assert(couleur([NC])),
+    retract(plateau(P)),
+    assert(plateau(NP)),
+    redessiner,!.
+    
 
 /*coup gagnant*/
 jouer_val:-
@@ -160,8 +204,11 @@ jouer_val:-
 	member(b,LJ),
 	couleur([C]),
 	plateau(P),
+	
 	accessible(b,C,P,L_accessible),
 	member([8,O,NC],L_accessible),
+	/* la dernière ligne adverse est accessible on a gagné*/
+	
 	deplacer2(b,C,8,O,NP,NC),
 	retract(plateau(P)),
 	assert(plateau(NP)),
@@ -173,100 +220,18 @@ jouer_val:-
 /*Coup quelquonque*/
 jouer_val:-
     couleur([C|_]),
-
-    /* length(L,nb_elem),
-    nb_elem = 0,*/
-    
     plateau(P),
+    
     accessible(b,C,P,L_coup_possible),
-    my_sort(L_coup_possible,L_trie),
-    write(L_trie),nl,
+    my_sort(L_coup_possible,L_trie), /* on trie les coups dans l'ordre du plus loin aux plus près */
 
-    length(L_coup_possible,N),
-    N < 4,
-    nl,nl,nl,nl,nl,
+    /* on simule à un coup à l'avance */
     meilleur_coup(C,P,L_trie,L,1),
-    write('polp'),nl,
-    my_sort2(L,L4),
-    write(L4),nl,
-    
+
+    /* on maximise */
     my_sort2(L,[[A,O,NC,_]|_]),
+    
     /*on joue le meuilleur coup*/
-    deplacer2(b,C,A,O,NP,NC),
-    retract(joueur(_)),
-    assert(joueur([a])),
-    retract(couleur([C])),
-    assert(couleur([NC])),
-    plateau(P),
-    retract(plateau(P)),
-    assert(plateau(NP)),
-    redessiner,!.
-
-jouer_val:-
-    couleur([C|_]),
-
-    /* length(L,nb_elem),
-    nb_elem = 0,*/
-    
-    plateau(P),
-    accessible(b,C,P,L_coup_possible),
-    my_sort(L_coup_possible,L_trie),
-    write(L_trie),nl,
-    
-    meilleur_coup(C,P,L_trie,L,0),
-    my_sort2(L,L4),
-    write(L4),nl,
-    
-    my_sort2(L,[[A,O,NC,_]|_]),
-    /*on joue le meuilleur coup*/
-    deplacer2(b,C,A,O,NP,NC),
-    retract(joueur(_)),
-    assert(joueur([a])),
-    retract(couleur([C])),
-    assert(couleur([NC])),
-    plateau(P),
-    retract(plateau(P)),
-    assert(plateau(NP)),
-    redessiner,!.
-
-/*Pas de meilleur coup, on va le plus loin possible*/
-/*Option 1 : Aller le plus loin san perdre*/
-jouer_val:-
-    write('pas top'),nl,
-    couleur([C|_]),
-
-    /* length(L,nb_elem),
-    nb_elem = 0,*/
-    
-    plateau(P),
-    accessible(b,C,P,L_coup_possible),
-    my_sort(L_coup_possible,L_trie),
-
-    /*on joue le coup le plus loin*/
-    le_plus_loin_sans_perde(C,L_trie,[A,O,NC]),
-    deplacer2(b,C,A,O,NP,NC),
-    retract(joueur(_)),
-    assert(joueur([a])),
-    retract(couleur([C])),
-    assert(couleur([NC])),
-    plateau(P),
-    retract(plateau(P)),
-    assert(plateau(NP)),
-    redessiner,!.
-
-
-/*Option 2 : L'ia est condamnée à perdre*/
-jouer_val:-
-    write('comdamnée'),nl,
-    couleur([C|_]),
-
-    /* length(L,nb_elem),
-    nb_elem = 0,*/
-    
-    plateau(P),
-    accessible(b,C,P,[[A,O,NC]|_]),
-
-    /*on joue le coup le plus loin*/
     deplacer2(b,C,A,O,NP,NC),
     retract(joueur(_)),
     assert(joueur([a])),
@@ -293,14 +258,8 @@ jouer_val:-
 	write('Noir ne peut pas jouer car il est bloqué'),nl,
 	redessiner,!.
 
-jouer_val:-
-    couleur(L),
-    length(L,nb_elem),
-    nb_elem > 1,
-    
 
-
-/*fonctions de tri*/
+/*prédicat de tri dont les éléments sont composés de 3 éléments, tri croissant en fonction du 1er*/
 switch_unsorted([], []).
 switch_unsorted([X|[]], [X]).
 
@@ -328,7 +287,7 @@ my_sort(L,L_):-
     L_ = L_3,!.
 
 
-/*fonctions de tri*/
+/*prédicat de tri dont les éléments sont composés de 4 éléments, tri croissant en fonction du 4ème*/
 switch_unsorted2([], []).
 switch_unsorted2([X|[]], [X]).
 
@@ -355,7 +314,7 @@ my_sort2(L,L_):-
     my_sort2(L_2,L_3),
     L_ = L_3,!.
 
-/*fonctions de tri*/
+/*prédicat de tri dont les éléments sont composés de 4 éléments, tri décroissant en fonction du 4ème*/
 switch_unsorted3([], []).
 switch_unsorted3([X|[]], [X]).
 
@@ -383,41 +342,33 @@ my_sort3(L,L_):-
     L_ = L_3,!.
 
 
-/*predicat sans perte*/
-le_plus_loin_sans_perde(_,[],[]).
-le_plus_loin_sans_perde(C,[[A,O,NC]|_],[A,O,NC]):-
-    deplacer2(b,C,A,O,P2,C2),
-    accessible(a,C2,P2,L_accessible),
-    not(member([1,_,_],L_accessible)).
-le_plus_loin_sans_perde(C,[[A,O,NC]|_],[A,O,NC]):-
-    deplacer2(b,C,A,O,P2,C2),
-    accessible(a,C2,P2,L_accessible),
-    member([1,_,_],L_accessible).
+/*** prédicats permetant de savoir les couleurs bloquées ***/
 
-
-/******************************************/
-
+/** la couleur Coul du joueur b peut atteindre la ligne victorieuse, le joueur a ne peut s'arrêter sûr cette couleur -> cette couleur est "bloquée" pour le joueur a **/
 test_couleur_bloquee(a,Coul,P,L,L_):-
     accessible(b,Coul,P,L_coup_possible),
     memberchk([8,_,_],L_coup_possible),
     append([Coul],L,L_),!.
 
+/** sinon elle ne l'est pas **/
 test_couleur_bloquee(a,Coul,P,L,L_):-
     accessible(b,Coul,P,L_coup_possible),
     not(memberchk([8,_,_],L_coup_possible)),
     append([],L,L_),!.
 
+/** la couleur Coul du joueur a peut atteindre la ligne victorieuse, le joueur b ne peut s'arrêter sûr cette couleur -> cette couleur est "bloquée" pour le joueur b **/
 test_couleur_bloquee(b,Coul,P,L,L_):-
     accessible(a,Coul,P,L_coup_possible),
     memberchk([1,_,_],L_coup_possible),
     append([Coul],L,L_),!.
 
+/** sinon elle ne l'est pas **/
 test_couleur_bloquee(b,Coul,P,L,L_):-
     accessible(a,Coul,P,L_coup_possible),
     not(memberchk([1,_,_],L_coup_possible)),
     append([],L,L_),!.
 
-/*Liste des cases où le joueur ne peut pas s'arreter                  /!\problème si le déplacement change cette liste*/
+/* Liste des cases où le joueur J ne peut pas s'arreter */
 liste_couleur_bloquee(J,P,L):-
     test_couleur_bloquee(J,brown,P,[],L1),
     test_couleur_bloquee(J,green,P,L1,L2),
@@ -428,8 +379,4 @@ liste_couleur_bloquee(J,P,L):-
     test_couleur_bloquee(J,blue,P,L6,L7),
     test_couleur_bloquee(J,orange,P,L7,L),!.
 
-/*Liste des cases où le joueur peut s'arreter                         idem*/
-liste_couleur_autorisee(J,P,L):-
-    liste_couleur_bloquee(J,P,L_),
-    subtract([brown,green,red,yellow,pink,purple,blue,orange],L_,L),!.
 

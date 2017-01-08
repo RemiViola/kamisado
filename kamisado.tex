@@ -70,21 +70,56 @@ For more interesting tests when you start, you can try :
 red-forward-4 + blue-forward-3 + orange-left-5 + pink-forward-5 + red-left-1...
 \end{verbatim}
 After the first move, the artificial intelligence forces you to move your blue tower because it can't have an attack position. After the second, it move to a position where it will attack directly with its active tower when you will let it play this tower.
-After the third, it moves its orange tower to the pink square because it's the nearest postition where it can force you to free a square to attack. It doesn't choose the blue square because it would let you win. After each other move, the artificial intelligence move to have an attack position. 
+After the third, it moves its orange tower to the pink square because it's the nearest position where it can force you to free a square to attack. It doesn't choose the blue square because it would let you win. After each other move, the artificial intelligence move to have an attack position. 
 In this situation, you just have the yellow square free for your brown tower... But you can win with the following sequence : 
 \begin{verbatim}
 ...brown-forward-3 + yellow-right-2 + pink-forward-2
 \end{verbatim}
 The first move is compulsory. The second asks to the artificial intelligence to move its orange tower which is blocked. The third go to the goal.
 
+\newpage
 \subsection{valentin}
+The goal is to associate a score for any snapshot of the game.
 
+\subsubsection{snapshot evaluation}
+I used the number of blocked colors, that's mean : all colors where it's impossible for the opponent to stop a tower. Two examples :\\
+\begin{center}
+\includegraphics[scale = 0.30]{val1.png}
+\includegraphics[scale = 0.30]{val2.png}
+\end{center}
+For the left example :\\
+In this case the gamer in black can't stop a tower on a purple scare, because if he do that, he loose. So the color purple is block for the black gamer, and it's the only one so he have one blocked colors. The white gamer have no blocked colors.\\
+For the right example :\\
+2 blocked colors for the black gamer : red and purple\\
+2 blocked colors for the white gamer : orange and brown\\\\
+So the number of blocked colors is between 0 and 8, so if a snapshot is a win snapshot the score is 9 and if it's a loose snapshot the score is -1. A win snapshot is a snapshot where the colors I should use can access to the winning line. A loose snapshot is the opposite.
+
+\subsubsection{anticipation}
+To do that I compute a Min-Max for four blow. My blow, the opponent blow, two times.
+<
+\subsubsection{test}
+A good way to see the anticipation :
+\begin{verbatim}
+brown-forward-6 + nothing
+\end{verbatim}
+The ia now you should pass and it will win after that.\\
+
+It's a little bit tricky to see the heuristic because it's difficult for a human to anticipate four blow. But a good start to understand :
+\begin{verbatim}
+brown-forward-1 ...
+\end{verbatim}
 
 \subsection{mathieu}
 
 
 \subsection{mathieu2}
-Contrary to the previous version, we do not count any more the accessible squares but the number of towers which can win at the next move. 
-With this heuristics, the first moves are the same but as soon as it is possible, the artificial intelligence tries finally to increase the number of empty compartments on the last line.
+Contrary to the previous version, we do not count any more the accessible final squares but the number of towers which can win at their next move. 
+With this heuristics, the first moves are the same but as soon as possible, the artificial intelligence tries finally to increase the number of empty squares on the last line.
+
+\subsection{mathieu3}
+In this version, we decided to take into account also the number of accessible final squares of the opponent as a penalty in our evaluation.
+
+\subsection{mathieu4}
+In this final version, we decided to increase the evaluation by 20 times the difference between the number of accessible squares for the player and for the artificial intelligence. We also increase this evaluation by the difference between the number of accessible final squares by each of them.
 
 \end{document}
