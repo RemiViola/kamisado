@@ -4,15 +4,13 @@
 
 % if the computer begins the play
 % we choose randomly the color of the first move
-% Compute the best move for computer with minimax
+% Compute the best move for computer with alphabeta
 jouer_mat4:-
     joueur(L_joueur),
     member(b,L_joueur),
     couleur([Color,Color2|Tail]),
     plateau(Board),
     random_member(X, [Color,Color2|Tail]),
-    retract(n_round(_)),
-    assert(n_round(1)),
     bestMove([b, X, play, Board], [_NextPlayer, NColor, State, NextBoard]),
     n_round(NR),
     NR2 is NR+1,
@@ -27,7 +25,7 @@ jouer_mat4:-
     redessiner,
     fin(State),!.
 
-% Compute the best move for computer with minimax
+% Compute the best move for computer with alphabeta
 jouer_mat4:-
     joueur(L_joueur),
     member(b,L_joueur),
@@ -58,12 +56,11 @@ fin(State):-
     retract(couleur(_)),
     send(@p, display,new(Text, text('YOU LOOSE')), point(660, 140)),
     send(Text, font, font(times, bold, 40)).
-
 % bestMove(+Pos, -NextPos)
 % Compute the best Next Position from Position Pos
-% with minimax algorithm.
+% with alphabeta algorithm.
 bestMove(Pos, NextPos) :-
-    minimax(Pos, NextPos, _, 0).
+    alphabeta(Pos, -999, 999, NextPos, _, 0).
 
 % winPos(+Player, +Board)
 % True if Player win in Board.
@@ -78,33 +75,56 @@ winPos(a, _C, Board):-
 nextPlayer(a, b).
 nextPlayer(b, a).
 
-% minimax(Pos, BestNextPos, Val)
+% alphabeta(Pos, Alpha, Beta, BestNextPos, Val, Iteration)
 % Pos is a position, Val is its minimax value.
 % Best move from Pos leads to position BestNextPos.
-minimax(Pos, BestNextPos, Val, Iteration) :-                     % Pos has successors
-    Iteration2 is Iteration +1, 
+alphabeta(Pos, Alpha, Beta, BestNextPos, Val, Iteration) :-     % Pos has successors
+    Iteration2 is Iteration +1,
     bagof(NextPos, move(Pos, NextPos, Iteration2), NextPosList),
-    best(NextPosList, BestNextPos, Val, Iteration2), !.
+    boundedbest(NextPosList, Alpha, Beta, BestNextPos, Val, Iteration2), !.
 
-minimax(Pos, _, Val, _) :-                     % Pos has no successors
+alphabeta(Pos, _, _, _, Val, _) :-    % Pos has no successors
     utility(Pos, Val).
 
-best([Pos], Pos, Val, Iteration) :-
-    minimax(Pos, _, Val, Iteration).
+%   goodenough(+PosList, +Alpha, +Beta, +Pos, +Val, -BestPos, -BestVal, +Iteration)
+boundedbest([Pos | PosList], Alpha, Beta, BestPos, BestVal, Iteration) :-
+    alphabeta(Pos, Alpha, Beta, _, Val, Iteration),
+    goodenough(PosList, Alpha, Beta, Pos, Val, BestPos, BestVal, Iteration).
 
-best([Pos1 | PosList], BestPos, BestVal, Iteration) :-
-    minimax(Pos1, _, Val1, Iteration),
-    best(PosList, Pos2, Val2, Iteration),
-    betterOf(Pos1, Val1, Pos2, Val2, BestPos, BestVal).
+% goodenough(+PosList, +Alpha, +Beta, +Pos, +Val, -GoodPos, -GoodVal, +Iteration)
+goodenough( [], _, _, Pos, Val, Pos, Val, _Iteration):-!.
 
-betterOf(Pos0, Val0, _, Val1, Pos0, Val0) :-   % Pos0 better than Pos1
-    min_to_move(Pos0),                         % MIN to move in Pos0
-    Val0 > Val1, !                             % MAX prefers the greater value
+goodenough(_, Alpha, Beta, Pos, Val, Pos, Val, _Iteration) :-  
+    min_to_move(Pos),           % Maximizer attained upper bound
+    Val > Beta, !               
     ;
-    max_to_move(Pos0),                         % MAX to move in Pos0
-    Val0 < Val1, !.                            % MIN prefers the lesser value
+    max_to_move(Pos),           % Minimizer attained lower bound
+    Val < Alpha, !.                            
 
-betterOf(_, _, Pos1, Val1, Pos1, Val1).        % Otherwise Pos1 better than Pos0
+goodenough(PosList, Alpha, Beta, Pos, Val, GoodPos, GoodVal, Iteration):-
+    newbounds( Alpha, Beta, Pos, Val, NewAlpha, NewBeta),
+    boundedbest( PosList, NewAlpha, NewBeta, Pos1, Val1,Iteration),
+    betterof( Pos, Val, Pos1, Val1, GoodPos, GoodVal).
+
+% Maximizer increased lower bound
+newbounds( Alpha, Beta, Pos, Val, Val, Beta):-
+	 min_to_move( Pos), Val > Alpha, !.
+
+% Minimizer decreased upper bound
+newbounds( Alpha, Beta, Pos, Val, Alpha, Val):-
+	 max_to_move( Pos), Val < Beta, !.
+
+% Otherwise bounds unchanged
+newbounds( Alpha, Beta, _, _, Alpha, Beta).
+
+% Pos better than Pos1
+betterof( Pos, Val, _Pos1, Val1, Pos, Val):-
+    min_to_move( Pos), Val > Val1, !
+    ;
+    max_to_move( Pos), Val < Val1, !.
+
+% Otherwise Pos1 better
+betterof( _, _, Pos1, Val1, Pos1, Val1).
 
 % move(+Pos, -NextPos)
 % True if there is a legal (according to rules) move from Pos to NextPos.
@@ -149,23 +169,19 @@ max_to_move([b, _, _, _]).
 % utility(+Pos, -Val) :-
 % True if Val the the result of the evaluation function at Pos.
 % We will evaluate for final position and cut position.
-% We will use  100 when MAX win
-%             -100 when MIN win
+% We will use  200 when MAX win
+%             -200 when MIN win
 % and the number of winning position in the available list for every tower of the previous player when MIN cut
 % its negation when MAX cut
-utility([b, _, win, _], -100).       % Previous player (MAX) has win.
-utility([a, _, win, _], 100).      % Previous player (MIN) has win.
+utility([b, _, win, _], -200).       % Previous player (MAX) has win.
+utility([a, _, win, _], 200).      % Previous player (MIN) has win.
 
-utility([a, _, cut, Board], Eval):-
-    eval(a, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).
-
-utility([b, _, cut, Board], Eval):-
-    eval(b, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).
-
+utility([_, _, cut, Board], Eval):-
+    eval(_, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).
 
 eval(_,[],_,0).
 
-eval(a,[H|T],Plateau,Eval_t1):-
+eval(_,[H|T],Plateau,Eval_t1):-
 	accessible(a, H, Plateau, L_accessible_a),
 	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
 	length(L_eval_a,Eval_a),
@@ -174,9 +190,9 @@ eval(a,[H|T],Plateau,Eval_t1):-
 	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
 	length(L_eval_b,Eval_b),
 	Eval_b==0,
-	eval(a,T,Plateau,Eval_t1).
+	eval(_,T,Plateau,Eval_t1).
 
-eval(a,[H|T],Plateau,Eval):-
+eval(_,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
 	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
 	length(L_eval_a,Eval_a),
@@ -185,11 +201,11 @@ eval(a,[H|T],Plateau,Eval):-
 	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
 	length(L_eval_b,Eval_b),
 	Eval_b\==0,
-	eval(a,T,Plateau,Eval_t1),
+	eval(_,T,Plateau,Eval_t1),
 	Eval_ is Eval_t1 + Eval_a,
 	Eval is Eval_ - Eval_b.
 
-eval(a,[H|T],Plateau,Eval):-
+eval(_,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
 	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
 	length(L_eval_a,Eval_a),
@@ -198,11 +214,11 @@ eval(a,[H|T],Plateau,Eval):-
 	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
 	length(L_eval_b,Eval_b),
 	Eval_b==0,
-	eval(a,T,Plateau,Eval_t1),
+	eval(_,T,Plateau,Eval_t1),
 	Eval_ is Eval_t1 + 20,
 	Eval is Eval_ + Eval_a.
 
-eval(a,[H|T],Plateau,Eval):-
+eval(_,[H|T],Plateau,Eval):-
 	accessible(a, H, Plateau, L_accessible_a),
 	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
 	length(L_eval_a,Eval_a),
@@ -211,56 +227,6 @@ eval(a,[H|T],Plateau,Eval):-
 	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
 	length(L_eval_b,Eval_b),
 	Eval_b\==0,
-	eval(a,T,Plateau,Eval_t1),
+	eval(_,T,Plateau,Eval_t1),
 	Eval_ is Eval_t1 - 20,
 	Eval is Eval_ - Eval_b.
-
-eval(b,[H|T],Plateau,Eval_t1):-
-	accessible(a, H, Plateau, L_accessible_a),
-	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
-	length(L_eval_a,Eval_a),
-	Eval_a==0,
-	accessible(b, H, Plateau, L_accessible_b),
-	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
-	length(L_eval_b,Eval_b),
-	Eval_b==0,
-	eval(b,T,Plateau,Eval_t1).
-
-eval(b,[H|T],Plateau,Eval):-
-	accessible(a, H, Plateau, L_accessible_a),
-	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
-	length(L_eval_a,Eval_a),
-	Eval_a\==0,
-	accessible(b, H, Plateau, L_accessible_b),
-	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
-	length(L_eval_b,Eval_b),
-	Eval_b\==0,
-	eval(b,T,Plateau,Eval_t1),
-	Eval_ is Eval_t1 - Eval_a,
-	Eval is Eval_ + Eval_b.
-
-eval(b,[H|T],Plateau,Eval):-
-	accessible(a, H, Plateau, L_accessible_a),
-	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
-	length(L_eval_a,Eval_a),
-	Eval_a\==0,
-	accessible(b, H, Plateau, L_accessible_b),
-	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
-	length(L_eval_b,Eval_b),
-	Eval_b==0,
-	eval(b,T,Plateau,Eval_t1),
-	Eval_ is Eval_t1 - 20,
-	Eval is Eval_ - Eval_a.
-
-eval(b,[H|T],Plateau,Eval):-
-	accessible(a, H, Plateau, L_accessible_a),
-	findall(X ,member([1,X,_], L_accessible_a), L_eval_a),
-	length(L_eval_a,Eval_a),
-	Eval_a==0,
-	accessible(b, H, Plateau, L_accessible_b),
-	findall(Y ,member([8,Y,_], L_accessible_b), L_eval_b),
-	length(L_eval_b,Eval_b),
-	Eval_b\==0,
-	eval(b,T,Plateau,Eval_t1),
-	Eval_ is Eval_t1 + 20,
-	Eval is Eval_ + Eval_b.
