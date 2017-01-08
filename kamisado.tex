@@ -110,7 +110,9 @@ brown-forward-1 ...
 \end{verbatim}
 
 \subsection{mathieu}
-
+This artificial intelligence uses the alphabeta algorithm. We used the courses of the \emph{Ecole des Mines de Saint-Etienne}\footnote{\url{http://www.emse.fr/~picard/cours/ai/minimax/}} and \emph{Institut Montefiore de l'université de Liège}\footnote{\url{http://www.montefiore.ulg.ac.be/~vanlishout/repetitions/prolog/prolog_cp4.pdf}}, adapting it to our game. Firstly, we implemented the minimax algorithm, for reduce the computing time, we have implemented the alphabeta algorithm and we have limited recursion depth. The number of playable moves reduces each turn of play, the depth changes each turn : Number of turn + 3. \\
+We tried several evaluation function.
+The first evaluation function cunts the number of accessible final square for every tower of a player. 
 
 \subsection{mathieu2}
 Contrary to the previous version, we do not count any more the accessible final squares but the number of towers which can win at their next move. 
@@ -119,7 +121,18 @@ With this heuristics, the first moves are the same but as soon as possible, the 
 \subsection{mathieu3}
 In this version, we decided to take into account also the number of accessible final squares of the opponent as a penalty in our evaluation.
 
+\subsubsection{test}
+
 \subsection{mathieu4}
 In this final version, we decided to increase the evaluation by 20 times the difference between the number of accessible squares for the player and for the artificial intelligence. We also increase this evaluation by the difference between the number of accessible final squares by each of them.
 
+\subsubsection{test}
+\begin{verbatim}
+yellow-forward-4 red-forward-6
+\end{verbatim}
+By stopping on the brown box, the pink tower obliges the brown tower has released a winning square for the orange tower or the pink tower
+\begin{verbatim}
+brown-forward-4 purple-left-4
+\end{verbatim}
+By stopping on the green, the artificial intelligence necessarily wins, even if the player appears to have many possible blows. A winning position remains a priority in the evaluation function.
 \end{document}
