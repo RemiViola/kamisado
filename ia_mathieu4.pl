@@ -11,8 +11,6 @@ jouer_mat4:-
     couleur([Color,Color2|Tail]),
     plateau(Board),
     random_member(X, [Color,Color2|Tail]),
-    retract(n_round(_)),
-    assert(n_round(1)),
     bestMove([b, X, play, Board], [_NextPlayer, NColor, State, NextBoard]),
     n_round(NR),
     NR2 is NR+1,
@@ -149,12 +147,12 @@ max_to_move([b, _, _, _]).
 % utility(+Pos, -Val) :-
 % True if Val the the result of the evaluation function at Pos.
 % We will evaluate for final position and cut position.
-% We will use  100 when MAX win
-%             -100 when MIN win
+% We will use  400 when MAX win
+%             -400 when MIN win
 % and the number of winning position in the available list for every tower of the previous player when MIN cut
 % its negation when MAX cut
-utility([b, _, win, _], -100).       % Previous player (MAX) has win.
-utility([a, _, win, _], 100).      % Previous player (MIN) has win.
+utility([b, _, win, _], -400).       % Previous player (MAX) has win.
+utility([a, _, win, _], 400).      % Previous player (MIN) has win.
 
 utility([a, _, cut, Board], Eval):-
     eval(a, [brown,green,red,yellow,pink,purple,blue,orange],Board,Eval).

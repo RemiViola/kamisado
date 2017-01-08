@@ -11,8 +11,6 @@ jouer_mat2:-
     couleur([Color,Color2|Tail]),
     plateau(Board),
     random_member(X, [Color,Color2|Tail]),
-    retract(n_round(_)),
-    assert(n_round(1)),
     bestMove([b, X, play, Board], [_NextPlayer, NColor, State, NextBoard]),
     n_round(NR),
     NR2 is NR+1,
