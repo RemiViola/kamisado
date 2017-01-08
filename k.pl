@@ -385,6 +385,7 @@ ia_commencer(IA):-
 	plateau(Plateau),
 	dessiner_plateau(Plateau,@p),
 	send(@p, open),
+	sleep(5),
 	jouer.
 
 /*Pour le raffraichissement de l'affichage plateau*/
