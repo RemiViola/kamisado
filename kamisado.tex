@@ -59,6 +59,8 @@ This heuristic is the simplest. The artificial intelligence selects all the squa
 If there is no possible square with this constraint, it selects the first square which forces the player to free a square which allows to win at the following move by the active tower.\\
 If there is no square which satisfy this new constraint, it selects the first square in the list.\\
 In the case there would be no playable square without risks, it knows that it will lose and it also chooses the first one of the list.\\ \\
+
+\subsubsection{test}
 To test this strategy, you have several possibilities. If the artificial intelligence starts, it chooses the first color randomly but you can see that, for each color, it move on the nearest square where it can force the user to move.
 If you start, you can try this fatal first move : 
 \begin{verbatim}
@@ -110,13 +112,32 @@ brown-forward-1 ...
 \end{verbatim}
 
 \subsection{mathieu}
-This artificial intelligence uses the alphabeta algorithm. We used the courses of the \emph{Ecole des Mines de Saint-Etienne}\footnote{\url{http://www.emse.fr/~picard/cours/ai/minimax/}} and \emph{Institut Montefiore de l'université de Liège}\footnote{\url{http://www.montefiore.ulg.ac.be/~vanlishout/repetitions/prolog/prolog_cp4.pdf}}, adapting it to our game. Firstly, we implemented the minimax algorithm, for reduce the computing time, we have implemented the alphabeta algorithm and we have limited recursion depth. The number of playable moves reduces each turn of play, the depth changes each turn : Number of turn + 3. \\
+This artificial intelligence uses the alphabeta algorithm. We used the courses of the \emph{Ecole des Mines de Saint-Etienne} \footnote{\url{http://www.emse.fr/~picard/cours/ai/minimax/}} and \emph{Institut Montefiore de l'université de Liège} \footnote{\url{http://www.montefiore.ulg.ac.be/~vanlishout/repetitions/prolog/prolog_cp4.pdf}}, adapting it to our game. Firstly, we implemented the minimax algorithm, for reduce the computing time, we have implemented the alphabeta algorithm and we have limited recursion depth. The number of playable moves reduces each turn of play, the depth changes each turn : Number of turn + 3. \\
 We tried several evaluation function.
-The first evaluation function cunts the number of accessible final square for every tower of a player. 
+The first evaluation function cunts the number of accessible final squares for every tower of a player. 
+
+\subsubsection{test}
+Like for ia\_valentin, it's not easy to see the heuristic but you can try :
+\begin{verbatim}
+green-forward-3 + red-forward-3 + orange-forward-1 ...
+\end{verbatim}
+The first answer seems strange but the second is more logical. The artificial intelligence wants that you free the orange square. It's the same for the third with the pink square.
+After that, you have several options. You know that the red and the green squares are forbidden. The pink too but it is very interesting to test it.
 
 \subsection{mathieu2}
 Contrary to the previous version, we do not count any more the accessible final squares but the number of towers which can win at their next move. 
 With this heuristics, the first moves are the same but as soon as possible, the artificial intelligence tries finally to increase the number of empty squares on the last line.
+
+\subsubsection{test}
+\begin{verbatim}
+green-forward-3 + brown-right-5 + red-forward-2 + red-right-2 + red+forward-2 ...
+\end{verbatim}
+With this sequence, you can use the same strategy as for the previous example. You can also see that the artificial intelligence tries to increase the number of towers which can win, until it is blocked for three blow.
+After that blows, it seems that you go to the goal with : 
+\begin{verbatim}
+... blue-left-5 + purple-right-2 + purple-left-4 ...
+\end{verbatim}
+but you are blocked... All the available squares will lead you to the defeat.
 
 \subsection{mathieu3}
 In this version, we decided to take into account also the number of accessible final squares of the opponent as a penalty in our evaluation.
