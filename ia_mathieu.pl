@@ -4,7 +4,7 @@
 
 % if the computer begins the play
 % we choose randomly the color of the first move
-% Compute the best move for computer with minimax
+% Compute the best move for computer with alphabeta
 jouer_mat:-
     joueur(L_joueur),
     member(b,L_joueur),
@@ -59,9 +59,9 @@ fin(State):-
 
 % bestMove(+Pos, -NextPos)
 % Compute the best Next Position from Position Pos
-% with minimax algorithm.
+% with alphabeta algorithm.
 bestMove(Pos, NextPos) :-
-    minimax(Pos, NextPos, _, 0).
+    alphabeta(Pos, -999, 999, NextPos, _, 0).
 
 % winPos(+Player, +Board)
 % True if Player win in Board.
@@ -76,37 +76,60 @@ winPos(a, _C, Board):-
 nextPlayer(a, b).
 nextPlayer(b, a).
 
-% minimax(Pos, BestNextPos, Val, Iteration)
+% alphabeta(Pos, Alpha, Beta, BestNextPos, Val, Iteration)
 % Pos is a position, Val is its minimax value.
 % Best move from Pos leads to position BestNextPos.
-minimax(Pos, BestNextPos, Val, Iteration) :-                     % Pos has successors
-    Iteration2 is Iteration +1, 
+alphabeta(Pos, Alpha, Beta, BestNextPos, Val, Iteration) :-     % Pos has successors
+    Iteration2 is Iteration +1,
     bagof(NextPos, move(Pos, NextPos, Iteration2), NextPosList),
-    best(NextPosList, BestNextPos, Val, Iteration2), !.
+    boundedbest(NextPosList, Alpha, Beta, BestNextPos, Val, Iteration2), !.
 
-minimax(Pos, _, Val, _) :-                     % Pos has no successors
+alphabeta(Pos, _, _, _, Val, _) :-    % Pos has no successors
     utility(Pos, Val).
 
-best([Pos], Pos, Val, Iteration) :-
-    minimax(Pos, _, Val, Iteration).
+%   goodenough(+PosList, +Alpha, +Beta, +Pos, +Val, -BestPos, -BestVal, +Iteration)
+boundedbest([Pos | PosList], Alpha, Beta, BestPos, BestVal, Iteration) :-
+    alphabeta(Pos, Alpha, Beta, _, Val, Iteration),
+    goodenough(PosList, Alpha, Beta, Pos, Val, BestPos, BestVal, Iteration).
 
-best([Pos1 | PosList], BestPos, BestVal, Iteration) :-
-    minimax(Pos1, _, Val1, Iteration),
-    best(PosList, Pos2, Val2, Iteration),
-    betterOf(Pos1, Val1, Pos2, Val2, BestPos, BestVal).
+% goodenough(+PosList, +Alpha, +Beta, +Pos, +Val, -GoodPos, -GoodVal, +Iteration)
+goodenough( [], _, _, Pos, Val, Pos, Val, _Iteration):-!.
 
-betterOf(Pos0, Val0, _, Val1, Pos0, Val0) :-   % Pos0 better than Pos1
-    min_to_move(Pos0),                         % MIN to move in Pos0
-    Val0 > Val1, !                             % MAX prefers the greater value
+goodenough(_, Alpha, Beta, Pos, Val, Pos, Val, _Iteration) :-  
+    min_to_move(Pos),           % Maximizer attained upper bound
+    Val > Beta, !               
     ;
-    max_to_move(Pos0),                         % MAX to move in Pos0
-    Val0 < Val1, !.                            % MIN prefers the lesser value
+    max_to_move(Pos),           % Minimizer attained lower bound
+    Val < Alpha, !.                            
 
-betterOf(_, _, Pos1, Val1, Pos1, Val1).        % Otherwise Pos1 better than Pos0
+goodenough(PosList, Alpha, Beta, Pos, Val, GoodPos, GoodVal, Iteration):-
+    newbounds( Alpha, Beta, Pos, Val, NewAlpha, NewBeta),
+    boundedbest( PosList, NewAlpha, NewBeta, Pos1, Val1,Iteration),
+    betterof( Pos, Val, Pos1, Val1, GoodPos, GoodVal).
+
+% Maximizer increased lower bound
+newbounds( Alpha, Beta, Pos, Val, Val, Beta):-
+	 min_to_move( Pos), Val > Alpha, !.
+
+% Minimizer decreased upper bound
+newbounds( Alpha, Beta, Pos, Val, Alpha, Val):-
+	 max_to_move( Pos), Val < Beta, !.
+
+% Otherwise bounds unchanged
+newbounds( Alpha, Beta, _, _, Alpha, Beta).
+
+% Pos better than Pos1
+betterof( Pos, Val, _Pos1, Val1, Pos, Val):-
+    min_to_move( Pos), Val > Val1, !
+    ;
+    max_to_move( Pos), Val < Val1, !.
+
+% Otherwise Pos1 better
+betterof( _, _, Pos1, Val1, Pos1, Val1).
 
 % move(+Pos, -NextPos, +Iteration)
 % True if there is a legal (according to rules) move from Pos to NextPos.
-% Iteration allows to reduce the computation time by limiting the recursion to number of round + 3
+% The NextPos with cut allows to reduce the computation time by limiting the recursion to number of round + 3
 move([X1, C1, play, Board], [X2, C2, win, NextBoard], _) :-
     nextPlayer(X1, X2),
     move_aux(X1, C1, Board, C2, NextBoard),
