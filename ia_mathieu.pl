@@ -11,8 +11,6 @@ jouer_mat:-
     couleur([Color,Color2|Tail]),
     plateau(Board),
     random_member(X, [Color,Color2|Tail]),
-    retract(n_round(_)),
-    assert(n_round(1)),
     bestMove([b, X, play, Board], [_NextPlayer, NColor, State, NextBoard]),
     n_round(NR),
     NR2 is NR+1,
@@ -78,7 +76,7 @@ winPos(a, _C, Board):-
 nextPlayer(a, b).
 nextPlayer(b, a).
 
-% minimax(Pos, BestNextPos, Val)
+% minimax(Pos, BestNextPos, Val, Iteration)
 % Pos is a position, Val is its minimax value.
 % Best move from Pos leads to position BestNextPos.
 minimax(Pos, BestNextPos, Val, Iteration) :-                     % Pos has successors
@@ -106,9 +104,9 @@ betterOf(Pos0, Val0, _, Val1, Pos0, Val0) :-   % Pos0 better than Pos1
 
 betterOf(_, _, Pos1, Val1, Pos1, Val1).        % Otherwise Pos1 better than Pos0
 
-% move(+Pos, -NextPos)
+% move(+Pos, -NextPos, +Iteration)
 % True if there is a legal (according to rules) move from Pos to NextPos.
-% The NextPos with cut allows to reduce the computation time by limiting the recursion to number of round + 3
+% Iteration allows to reduce the computation time by limiting the recursion to number of round + 3
 move([X1, C1, play, Board], [X2, C2, win, NextBoard], _) :-
     nextPlayer(X1, X2),
     move_aux(X1, C1, Board, C2, NextBoard),
