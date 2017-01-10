@@ -562,6 +562,8 @@ recommencer(IA):-
 ia_recommencer(IA):-
 	couleur(_),
 	retract(ia(_)),
+	retract(n_round(_)),
+	assert(n_round(1)),
 	free(@p),
 	free(@t1),
 	free(@t2),
@@ -585,6 +587,8 @@ ia_recommencer(IA):-
 ia_recommencer(IA):-
 	not(couleur(_)),
 	retract(ia(_)),
+	retract(n_round(_)),
+	assert(n_round(1)),
 	free(@p),
 	free(@t1),
 	free(@t2),
